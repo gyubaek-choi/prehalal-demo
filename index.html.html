@@ -1,0 +1,2485 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PreHalal — Pre-Certification Review System v0.5</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0f0f0f;
+    --surface: #181818;
+    --surface2: #222222;
+    --border: #2a2a2a;
+    --border2: #333;
+    --text: #e8e8e8;
+    --text2: #888;
+    --text3: #555;
+    --green: #22c55e;
+    --yellow: #eab308;
+    --red: #ef4444;
+    --accent: #6ee7b7;
+    --accent2: #059669;
+    --mono: 'IBM Plex Mono', monospace;
+    --sans: 'DM Sans', 'Noto Sans KR', sans-serif;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  body { background: var(--bg); color: var(--text); font-family: var(--sans); min-height: 100vh; font-size: 14px; line-height: 1.6; }
+
+  header {
+    border-bottom: 1px solid var(--border);
+    padding: 0 32px; height: 56px;
+    display: flex; align-items: center; justify-content: space-between;
+    position: sticky; top: 0;
+    background: rgba(15,15,15,0.96); backdrop-filter: blur(8px); z-index: 100;
+  }
+  .logo { font-family: var(--mono); font-size: 15px; color: var(--accent); letter-spacing: 0.05em; }
+  .logo span { color: var(--text3); }
+  .role-toggle { display: flex; gap: 4px; background: var(--surface); border: 1px solid var(--border); border-radius: 6px; padding: 3px; }
+  .role-btn { padding: 5px 14px; border-radius: 4px; border: none; background: transparent; color: var(--text2); font-family: var(--sans); font-size: 12px; cursor: pointer; transition: all 0.2s; font-weight: 500; line-height: 1.4; }
+  .role-btn.active { background: var(--surface2); color: var(--text); border: 1px solid var(--border2); }
+  .role-label { font-size: 11px; color: var(--text3); font-family: var(--mono); margin-right: 8px; }
+
+  .container { max-width: 960px; margin: 0 auto; padding: 40px 32px; }
+
+  /* PROGRESS */
+  .progress-bar { display: flex; align-items: center; margin-bottom: 40px; overflow-x: auto; padding-bottom: 4px; }
+  .step-item { display: flex; align-items: center; flex-shrink: 0; }
+  .step-dot { width: 28px; height: 28px; border-radius: 50%; border: 1px solid var(--border2); display: flex; align-items: center; justify-content: center; font-family: var(--mono); font-size: 11px; color: var(--text3); background: var(--surface); transition: all 0.3s; cursor: pointer; }
+  .step-dot.active { border-color: var(--accent); color: var(--accent); background: rgba(110,231,183,0.08); }
+  .step-dot.done { border-color: var(--accent2); background: var(--accent2); color: #000; }
+  .step-dot.stop { border-color: var(--red); background: rgba(239,68,68,0.15); color: var(--red); }
+  .step-line { width: 32px; height: 1px; background: var(--border2); flex-shrink: 0; }
+  .step-line.done { background: var(--accent2); }
+
+  /* PANEL */
+  .panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; overflow: hidden; margin-bottom: 20px; }
+  .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--border); display: flex; align-items: center; gap: 12px; }
+  .panel-step { font-family: var(--mono); font-size: 10px; color: var(--text3); background: var(--surface2); border: 1px solid var(--border2); padding: 2px 7px; border-radius: 3px; letter-spacing: 0.08em; }
+  .panel-title { font-size: 14px; font-weight: 500; }
+  .panel-title-kr { font-size: 12px; color: var(--text3); margin-left: 6px; }
+  .panel-body { padding: 20px; }
+
+  /* FORM */
+  .field { margin-bottom: 16px; }
+  .field label { display: block; font-size: 12px; color: var(--text2); margin-bottom: 6px; font-family: var(--mono); }
+  .field label .kr { color: var(--text3); font-family: var(--sans); }
+  input, select, textarea { width: 100%; background: var(--bg); border: 1px solid var(--border2); border-radius: 5px; padding: 9px 12px; color: var(--text); font-family: var(--sans); font-size: 13px; outline: none; transition: border 0.2s; }
+  input:focus, select:focus, textarea:focus { border-color: var(--accent2); }
+  select option { background: var(--surface); }
+  textarea { resize: vertical; min-height: 130px; font-family: var(--mono); font-size: 12px; }
+  .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .field-row3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+
+  /* BUTTONS */
+  .btn { padding: 9px 20px; border-radius: 5px; border: none; font-family: var(--sans); font-size: 13px; font-weight: 500; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; gap: 6px; }
+  .btn-primary { background: var(--accent2); color: #fff; }
+  .btn-primary:hover { background: #047857; }
+  .btn-ghost { background: transparent; color: var(--text2); border: 1px solid var(--border2); }
+  .btn-ghost:hover { border-color: var(--text2); color: var(--text); }
+  .btn-danger { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+  .btn-row { display: flex; gap: 8px; justify-content: flex-end; margin-top: 20px; }
+
+  /* BADGES */
+  .badge { display: inline-flex; align-items: center; gap: 5px; padding: 3px 9px; border-radius: 4px; font-size: 11px; font-family: var(--mono); font-weight: 500; letter-spacing: 0.04em; white-space: nowrap; }
+  .badge-pass { background: rgba(34,197,94,0.12); color: var(--green); border: 1px solid rgba(34,197,94,0.2); }
+  .badge-hold { background: rgba(234,179,8,0.12); color: var(--yellow); border: 1px solid rgba(234,179,8,0.2); }
+  .badge-stop { background: rgba(239,68,68,0.12); color: var(--red); border: 1px solid rgba(239,68,68,0.2); }
+  .badge-ok { background: rgba(34,197,94,0.08); color: var(--green); border: 1px solid rgba(34,197,94,0.15); }
+  .badge-na { background: rgba(100,100,100,0.1); color: var(--text3); border: 1px solid var(--border2); }
+
+  /* CHECKLIST */
+  .checklist-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .checklist-item:last-child { border-bottom: none; }
+  .check-icon { width: 20px; height: 20px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 10px; flex-shrink: 0; margin-top: 2px; }
+  .check-yes { background: rgba(34,197,94,0.15); color: var(--green); }
+  .check-no { background: rgba(239,68,68,0.15); color: var(--red); }
+  .check-add { background: rgba(234,179,8,0.15); color: var(--yellow); }
+  .check-label { font-size: 13px; flex: 1; }
+  .check-label-kr { font-size: 11px; color: var(--text3); display: block; margin-top: 1px; }
+
+  /* UPLOAD ZONE */
+  .upload-zone {
+    border: 1px dashed var(--border2); border-radius: 5px; padding: 10px 14px;
+    background: var(--bg); margin-top: 8px; cursor: pointer;
+    transition: border 0.2s; display: flex; align-items: center; gap: 10px;
+  }
+  .upload-zone:hover { border-color: var(--accent2); }
+  .upload-zone input[type="file"] { display: none; }
+  .upload-zone-label { font-size: 11px; color: var(--text3); font-family: var(--mono); flex: 1; }
+  .upload-status { font-size: 11px; font-family: var(--mono); }
+  .uploaded { color: var(--green); }
+  .not-uploaded { color: var(--text3); }
+
+  /* INGREDIENT RESULTS */
+  .ingredient-row { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid var(--border); }
+  .ingredient-row:last-child { border-bottom: none; }
+  .ing-name { font-family: var(--mono); font-size: 12px; }
+  .ing-canonical { font-size: 11px; color: var(--text3); display: block; margin-top: 2px; }
+  .ing-detail { font-size: 12px; color: var(--text2); margin-top: 6px; padding: 8px 12px; background: var(--bg); border-radius: 4px; border-left: 2px solid var(--border2); }
+  .rule-ref { font-family: var(--mono); font-size: 10px; color: var(--accent); background: rgba(110,231,183,0.06); border: 1px solid rgba(110,231,183,0.15); padding: 2px 7px; border-radius: 3px; display: inline-block; margin-top: 4px; }
+  .guide-box { background: rgba(110,231,183,0.04); border: 1px solid rgba(110,231,183,0.12); border-radius: 5px; padding: 10px 14px; margin-top: 8px; font-size: 12px; color: var(--text2); }
+  .guide-title { font-size: 10px; color: var(--accent); font-family: var(--mono); margin-bottom: 4px; letter-spacing: 0.06em; }
+
+  /* RESULT SUMMARY */
+  .result-summary { border-radius: 8px; padding: 24px; margin-bottom: 20px; border: 1px solid; }
+  .result-pass { background: rgba(34,197,94,0.05); border-color: rgba(34,197,94,0.2); }
+  .result-hold { background: rgba(234,179,8,0.05); border-color: rgba(234,179,8,0.2); }
+  .result-stop { background: rgba(239,68,68,0.05); border-color: rgba(239,68,68,0.2); }
+  .result-icon { font-size: 28px; margin-bottom: 10px; }
+  .result-title { font-size: 17px; font-weight: 600; margin-bottom: 4px; }
+  .result-pass .result-title { color: var(--green); }
+  .result-hold .result-title { color: var(--yellow); }
+  .result-stop .result-title { color: var(--red); }
+
+  /* STOP ALERT */
+  .stop-alert { background: rgba(239,68,68,0.08); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 16px 20px; margin-bottom: 16px; }
+  .stop-alert-title { color: var(--red); font-weight: 600; font-size: 14px; margin-bottom: 6px; }
+
+  /* PAGE */
+  .page { display: none; }
+  .page.active { display: block; }
+
+  /* SECTIONS */
+  .section-title { font-size: 11px; font-family: var(--mono); color: var(--text3); letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 12px; padding-bottom: 8px; border-bottom: 1px solid var(--border); margin-top: 20px; }
+  .section-title:first-child { margin-top: 0; }
+
+  /* INFO ROW */
+  .info-row { display: flex; justify-content: space-between; align-items: center; padding: 8px 0; border-bottom: 1px solid var(--border); font-size: 13px; }
+  .info-row:last-child { border-bottom: none; }
+  .info-key { color: var(--text3); font-family: var(--mono); font-size: 11px; }
+
+  .hint { font-size: 11px; color: var(--text3); margin-top: 6px; font-family: var(--mono); }
+  .tag { display: inline-block; font-size: 10px; font-family: var(--mono); padding: 1px 6px; border-radius: 3px; background: var(--surface2); color: var(--text3); border: 1px solid var(--border2); margin-right: 4px; }
+  hr { border: none; border-top: 1px solid var(--border); margin: 16px 0; }
+
+  .analyzing { text-align: center; padding: 40px; color: var(--text3); font-family: var(--mono); font-size: 12px; }
+  @keyframes pulse { 0%,100%{opacity:1}50%{opacity:0.3} }
+  .analyzing span { animation: pulse 1.5s infinite; }
+
+  @media (max-width: 600px) {
+    .container { padding: 20px 16px; }
+    .field-row, .field-row3 { grid-template-columns: 1fr; }
+    header { padding: 0 16px; }
+  }
+</style>
+</head>
+<body class="manufacturer">
+
+<header>
+  <div class="logo">Pre<span>X</span> / PreHalal <span style="color:var(--text3);font-size:11px;margin-left:8px;">PoC v0.5</span></div>
+  <div style="display:flex;align-items:center;gap:12px;">
+    <span class="role-label">VIEW MODE</span>
+    <div class="role-toggle">
+      <button class="role-btn active" onclick="setRole('manufacturer')">Manufacturer<br><span style="font-size:10px;opacity:0.6">제조사</span></button>
+      <button class="role-btn" onclick="setRole('consultant')">Consultant<br><span style="font-size:10px;opacity:0.6">컨설팅사</span></button>
+    </div>
+  </div>
+</header>
+
+<div class="container">
+  <!-- PROGRESS BAR -->
+  <div class="progress-bar" id="progressBar">
+    <div class="step-item"><div class="step-dot active" id="dot0" onclick="tryGoStep(0)" title="Product Registration / 제품 등록">0</div></div>
+    <div class="step-line" id="line01"></div>
+    <div class="step-item"><div class="step-dot" id="dot1" onclick="tryGoStep(1)" title="Company Info / 기업·공장 정보">1</div></div>
+    <div class="step-line" id="line12"></div>
+    <div class="step-item"><div class="step-dot" id="dot2" onclick="tryGoStep(2)" title="Ingredients / 전성분">2</div></div>
+    <div class="step-line" id="line23"></div>
+    <div class="step-item"><div class="step-dot" id="dot3" onclick="tryGoStep(3)" title="Raw Materials / 원료 증빙">3</div></div>
+    <div class="step-line" id="line34"></div>
+    <div class="step-item"><div class="step-dot" id="dot4" onclick="tryGoStep(4)" title="Process / 제조 공정">4</div></div>
+    <div class="step-line" id="line45"></div>
+    <div class="step-item"><div class="step-dot" id="dot5" onclick="tryGoStep(5)" title="HAS/SJPH">5</div></div>
+    <div class="step-line" id="line56"></div>
+    <div class="step-item"><div class="step-dot" id="dot6" onclick="tryGoStep(6)" title="Labeling / 라벨">6</div></div>
+    <div class="step-line" id="line67"></div>
+    <div class="step-item"><div class="step-dot" id="dot7" onclick="tryGoStep(7)" title="Risk Branch / 리스크 분기">7</div></div>
+  </div>
+
+  <!-- ========== STEP 0: Product Registration ========== -->
+  <div class="page active" id="page0">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 0</span>
+        <span class="panel-title">Product Registration <span class="panel-title-kr">제품 등록</span></span>
+      </div>
+      <div class="panel-body">
+        <div class="section-title">Brand & Product Info 브랜드·제품 정보</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Brand Name <span class="kr">/ 브랜드명 *</span></label>
+            <input type="text" id="brandName" placeholder="e.g. AmorePacific" />
+          </div>
+          <div class="field">
+            <label>Product Name <span class="kr">/ 제품명 *</span></label>
+            <input type="text" id="productName" placeholder="e.g. Radiance Facial Cream" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Product Type <span class="kr">/ 제품 유형 *</span></label>
+            <select id="productType">
+              <option value="">Select type...</option>
+              <option value="Food 식품">Food 식품</option>
+              <option value="Cosmetics 화장품">Cosmetics 화장품</option>
+              <option value="Pharmaceuticals 의약품">Pharmaceuticals 의약품</option>
+            </select>
+          </div>
+          <div class="field">
+            <label>Manufacturing Method <span class="kr">/ 제조 방식 *</span></label>
+            <select id="mfgMethod">
+              <option value="">Select method...</option>
+              <option value="Own Manufacturing 자체 생산">Own Manufacturing 자체 생산</option>
+              <option value="OEM">OEM</option>
+              <option value="ODM">ODM</option>
+            </select>
+          </div>
+        </div>
+        <div class="field">
+          <label>Target Certification Market <span class="kr">/ 인증 목표 시장 *</span></label>
+          <select id="certMarket">
+            <option value="">Select market...</option>
+            <option value="Indonesia (BPJPH)">Indonesia (BPJPH)</option>
+            <option value="Malaysia (JAKIM)">Malaysia (JAKIM)</option>
+            <option value="UAE (ESMA)">UAE (ESMA)</option>
+          </select>
+          <div style="margin-top:6px;padding:7px 10px;background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.15);border-radius:4px;font-size:11px;color:var(--text3);">
+            ⚠ PoC v0.5: Rule DB is currently Indonesia (BPJPH) based. Market-specific rule localization (Malaysia JAKIM / UAE ESMA) is planned for MVP.<br>
+            <span style="color:var(--text3);">현재 Rule DB는 인도네시아(BPJPH) 기준입니다. 시장별 규칙 분기는 MVP에서 구현 예정입니다.</span>
+          </div>
+        </div>
+
+        <div class="section-title">Contact Person 담당자 정보</div>
+        <div class="field-row">
+          <div class="field">
+            <label>Name <span class="kr">/ 담당자명 *</span></label>
+            <input type="text" id="contactName" placeholder="e.g. Kim Jisoo" />
+          </div>
+          <div class="field">
+            <label>Email <span class="kr">/ 이메일 *</span></label>
+            <input type="email" id="contactEmail" placeholder="e.g. jisoo@company.com" />
+          </div>
+        </div>
+        <div class="field-row">
+          <div class="field">
+            <label>Phone <span class="kr">/ 연락처</span></label>
+            <input type="text" id="contactPhone" placeholder="e.g. +82-10-1234-5678" />
+          </div>
+          <div class="field">
+            <label>Company Name <span class="kr">/ 회사명</span></label>
+            <input type="text" id="companyName" placeholder="e.g. AmorePacific Co., Ltd." />
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-primary" onclick="nextStep(0)">Next: Company Info → <span style="font-size:11px;opacity:0.7">다음</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 1: Company & Factory Info ========== -->
+  <div class="page" id="page1">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 1</span>
+        <span class="panel-title">Company & Factory Info <span class="panel-title-kr">기업·공장 정보</span></span>
+      </div>
+      <div class="panel-body">
+
+        <div class="section-title">Corporate Documents 법인 서류</div>
+
+        <!-- Business Registration -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_1">!</div>
+          <div class="check-label" style="flex:1;">
+            Business Registration Certificate
+            <span class="check-label-kr">사업자등록증</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_1')">
+              <input type="file" id="f1_1" onchange="markUploaded('f1_1','ci1_1','s1_1')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_1">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Factory Info -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_2">!</div>
+          <div class="check-label" style="flex:1;">
+            Factory Information Document
+            <span class="check-label-kr">공장 정보 문서</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_2')">
+              <input type="file" id="f1_2" onchange="markUploaded('f1_2','ci1_2','s1_2')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_2">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Factory Location Map -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_3">!</div>
+          <div class="check-label" style="flex:1;">
+            Factory Location Map / Site Plan
+            <span class="check-label-kr">공장 위치 및 평면도</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_3')">
+              <input type="file" id="f1_3" onchange="markUploaded('f1_3','ci1_3','s1_3')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_3">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Subcontracting -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_4">!</div>
+          <div class="check-label" style="flex:1;">
+            Subcontracting / OEM Agreement (if applicable)
+            <span class="check-label-kr">위탁 관계 설명서 (OEM/ODM 해당 시)</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_4')">
+              <input type="file" id="f1_4" onchange="markUploaded('f1_4','ci1_4','s1_4')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_4">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="section-title">Halal Production Line Conditions 할랄 생산 라인 조건 (BPJPH)</div>
+
+        <!-- Production line separation -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_5">!</div>
+          <div class="check-label" style="flex:1;">
+            Production Line Separation Declaration
+            <span class="check-label-kr">할랄 전용 생산 라인 또는 공용 라인 구분 선언서</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">State whether halal line is dedicated or shared. If shared, cross-contamination prevention plan required.</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_5')">
+              <input type="file" id="f1_5" onchange="markUploaded('f1_5','ci1_5','s1_5')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_5">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Non-halal on same line -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_6">!</div>
+          <div class="check-label" style="flex:1;">
+            Non-Halal Product Co-Production Statement
+            <span class="check-label-kr">동일 라인 비할랄 제품 생산 여부 확인서</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">If non-halal products share the same line, cleaning procedure validation is mandatory.</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_6')">
+              <input type="file" id="f1_6" onchange="markUploaded('f1_6','ci1_6','s1_6')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_6">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- Raw material storage -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_7">!</div>
+          <div class="check-label" style="flex:1;">
+            Raw Material Storage Separation Plan
+            <span class="check-label-kr">원료 보관 창고 분리 계획서</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Halal and non-halal raw materials must be stored separately (BPJPH HAS 23000).</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_7')">
+              <input type="file" id="f1_7" onchange="markUploaded('f1_7','ci1_7','s1_7')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_7">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <!-- PHT appointment -->
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci1_8">!</div>
+          <div class="check-label" style="flex:1;">
+            Halal Supervisor (PHT) Appointment Letter
+            <span class="check-label-kr">할랄 담당자(PHT) 지정서</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Penyelia Halal — mandatory appointment under UU No.33/2014 Pasal 28.</span>
+          </div>
+          <div>
+            <label class="upload-zone" onclick="triggerUpload('f1_8')">
+              <input type="file" id="f1_8" onchange="markUploaded('f1_8','ci1_8','s1_8')" />
+              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-status not-uploaded" id="s1_8">Not uploaded</span>
+            </label>
+          </div>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep(1)">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(1)">Next: Ingredients →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 2: Ingredients ========== -->
+  <div class="page" id="page2">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 2</span>
+        <span class="panel-title">Product Info & Full Ingredient List <span class="panel-title-kr">제품 정보 및 전성분</span></span>
+      </div>
+      <div class="panel-body">
+        <div class="field">
+          <label>Product Description <span class="kr">/ 제품 설명</span></label>
+          <input type="text" id="productDesc" placeholder="e.g. Water-based moisturizing facial cream for daily use" />
+        </div>
+        <div class="field">
+          <label>Full Ingredient List <span class="kr">/ 전성분 리스트 (필수)</span></label>
+          <textarea id="ingredientInput" placeholder="Paste your full ingredient list here (one per line or comma-separated)&#10;전성분을 여기에 붙여넣으세요 (줄바꿈 또는 쉼표 구분)&#10;&#10;Test example:&#10;Water, Glycerin, Lactic Acid, Porcine Gelatin, Ethanol, Cetyl Alcohol, Carmine, Sodium Lauryl Sulfate, Tocopherol, Fragrance"></textarea>
+          <div class="hint">// Copy from Excel and paste directly. 엑셀에서 복사 후 붙여넣기 가능</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep(2)">← Back</button>
+          <button class="btn btn-primary" onclick="analyzeIngredients()">▶ Run Analysis 성분 분석 실행</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- RESULTS (shown after analysis) -->
+    <div id="analysisResult" style="display:none;">
+
+      <!-- PoC Disclaimer -->
+      <div style="margin-bottom:16px;padding:12px 16px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:6px;font-size:12px;color:var(--text2);">
+        <span style="font-family:var(--mono);font-size:10px;color:#818cf8;letter-spacing:0.06em;display:block;margin-bottom:4px;">PoC PRELIMINARY REVIEW ENGINE</span>
+        This analysis is generated by a preliminary review engine for internal workflow use. Results are based on a sample rule set and are not a legal determination of halal compliance. Final certification decisions rest with BPJPH-accredited bodies and qualified consultants.<br>
+        <span style="color:var(--text3);font-size:11px;">본 분석은 내부 사전 검토 워크플로우용입니다. 샘플 규칙 세트 기반이며 법적 할랄 적합성 판정이 아닙니다. 최종 인증 판단은 BPJPH 공인 기관 및 자격 있는 컨설턴트에게 귀속됩니다.</span>
+      </div>
+
+      <div id="resultSummaryBox"></div>
+
+      <!-- STOP JUMP NOTICE -->
+      <div id="stopJumpNotice" style="display:none;" class="stop-alert">
+        <div class="stop-alert-title">🛑 Prohibited Ingredient Detected — Forwarding to Final Report</div>
+        <div style="font-size:12px;color:var(--text2);">금지 성분이 발견되었습니다. 인증 진행이 불가합니다. 최종 리스크 분기 보고서로 이동합니다.</div>
+        <div class="btn-row" style="justify-content:flex-start;margin-top:12px;">
+          <button class="btn btn-danger" onclick="jumpToFinalReport()">→ Go to Final Report 최종 보고서 보기</button>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-header">
+          <span class="panel-step">ANALYSIS</span>
+          <span class="panel-title">Ingredient Review Results <span class="panel-title-kr">성분 판단 결과</span></span>
+        </div>
+        <div class="panel-body" id="ingredientResults"></div>
+      </div>
+
+      <!-- CONSULTANT ONLY: Guide -->
+      <div id="consultantGuidePanel" style="display:none;">
+        <div class="panel">
+          <div class="panel-header">
+            <span class="panel-step">CONSULTANT VIEW</span>
+            <span class="panel-title">Resolution Guide <span class="panel-title-kr">해결 가이드</span></span>
+          </div>
+          <div class="panel-body" id="consultantGuide"></div>
+        </div>
+      </div>
+
+      <div id="step2NextBtn" style="display:none;" class="btn-row">
+        <button class="btn btn-ghost" onclick="prevStep(2)">← Back</button>
+        <button class="btn btn-primary" onclick="nextStep(2)">Next: Raw Material Evidence →</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 3: Raw Material Evidence ========== -->
+  <div class="page" id="page3">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 3</span>
+        <span class="panel-title">Raw Material Evidence <span class="panel-title-kr">원료 단위 증빙</span></span>
+      </div>
+      <div class="panel-body">
+
+        <!-- HOLD/STOP ingredients re-shown -->
+        <div id="step3IssueIngredients"></div>
+
+        <div class="section-title" style="margin-top:20px;">Required Documents per Ingredient 원료별 필수 서류</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Upload supporting documents for each ingredient below. HOLD/STOP ingredients require priority attention.<br><span style="color:var(--text3);">아래 원료별 증빙 서류를 업로드하세요. HOLD/STOP 성분은 우선 처리 필요.</span></p>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_1">!</div>
+          <div class="check-label" style="flex:1;">Specification Sheets (all ingredients)<span class="check-label-kr">전 성분 규격서</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f3_1')">
+            <input type="file" id="f3_1" multiple onchange="markUploaded('f3_1','ci3_1','s3_1')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_1">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_2">!</div>
+          <div class="check-label" style="flex:1;">Certificate of Analysis — COA<span class="check-label-kr">성적서 (COA)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f3_2')">
+            <input type="file" id="f3_2" multiple onchange="markUploaded('f3_2','ci3_2','s3_2')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_2">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_3">!</div>
+          <div class="check-label" style="flex:1;">MSDS / SDS</div>
+          <label class="upload-zone" onclick="triggerUpload('f3_3')">
+            <input type="file" id="f3_3" multiple onchange="markUploaded('f3_3','ci3_3','s3_3')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_3">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_4">!</div>
+          <div class="check-label" style="flex:1;">Halal Certificates for ingredients (if available)<span class="check-label-kr">원료 할랄 인증서 (보유 시)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f3_4')">
+            <input type="file" id="f3_4" multiple onchange="markUploaded('f3_4','ci3_4','s3_4')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_4">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_5">!</div>
+          <div class="check-label" style="flex:1;">Origin Declaration — Animal / Plant / Synthetic / Microbial<span class="check-label-kr">원료 유래 설명서 (동물/식물/합성/미생물, 발효 여부)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f3_5')">
+            <input type="file" id="f3_5" multiple onchange="markUploaded('f3_5','ci3_5','s3_5')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_5">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_6">!</div>
+          <div class="check-label" style="flex:1;">Slaughter / Processing Method Certificate (animal-derived only)<span class="check-label-kr">도축·가공 방법 증빙 (동물 유래 원료 해당 시)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f3_6')">
+            <input type="file" id="f3_6" multiple onchange="markUploaded('f3_6','ci3_6','s3_6')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_6">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_7">!</div>
+          <div class="check-label" style="flex:1;">Fermentation Medium Declaration (fermented ingredients)<span class="check-label-kr">발효 배지 선언서 (발효 공정 원료 해당 시)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f3_7')">
+            <input type="file" id="f3_7" multiple onchange="markUploaded('f3_7','ci3_7','s3_7')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_7">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep(3)">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(3)">Next: Manufacturing Process →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 4: Manufacturing Process ========== -->
+  <div class="page" id="page4">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 4</span>
+        <span class="panel-title">Manufacturing Process & Equipment <span class="panel-title-kr">제조 공정 및 설비</span></span>
+      </div>
+      <div class="panel-body">
+        <div class="section-title">Process Documents 공정 서류</div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_1">!</div>
+          <div class="check-label" style="flex:1;">Process Flow Diagram<span class="check-label-kr">공정도 (Flow Chart)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_1')">
+            <input type="file" id="f4_1" onchange="markUploaded('f4_1','ci4_1','s4_1')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_1">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_2">!</div>
+          <div class="check-label" style="flex:1;">Equipment List<span class="check-label-kr">설비 리스트</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_2')">
+            <input type="file" id="f4_2" onchange="markUploaded('f4_2','ci4_2','s4_2')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_2">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_3">!</div>
+          <div class="check-label" style="flex:1;">Shared Equipment Product List<span class="check-label-kr">동일 설비 사용 제품 목록</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_3')">
+            <input type="file" id="f4_3" onchange="markUploaded('f4_3','ci4_3','s4_3')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_3">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_4">!</div>
+          <div class="check-label" style="flex:1;">Equipment Cleaning Procedure<span class="check-label-kr">설비 세척 절차서</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_4')">
+            <input type="file" id="f4_4" onchange="markUploaded('f4_4','ci4_4','s4_4')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_4">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="section-title">Additional BPJPH Requirements 추가 BPJPH 요구사항</div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_5">!</div>
+          <div class="check-label" style="flex:1;">Cross-Contamination Prevention Plan<span class="check-label-kr">교차오염 방지 계획서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Required if shared production line with non-halal products.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_5')">
+            <input type="file" id="f4_5" onchange="markUploaded('f4_5','ci4_5','s4_5')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_5">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_6">!</div>
+          <div class="check-label" style="flex:1;">Halal Zone Marking / Layout Drawing<span class="check-label-kr">할랄 구역 표시 도면</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Physical segregation of halal production zones.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_6')">
+            <input type="file" id="f4_6" onchange="markUploaded('f4_6','ci4_6','s4_6')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_6">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_7">!</div>
+          <div class="check-label" style="flex:1;">Hazardous Material & Prohibited Substance Management Records<span class="check-label-kr">유해물질 및 금지물질 관리 기록</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_7')">
+            <input type="file" id="f4_7" onchange="markUploaded('f4_7','ci4_7','s4_7')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_7">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci4_8">!</div>
+          <div class="check-label" style="flex:1;">Production Record / Batch Record Sample<span class="check-label-kr">생산 기록 / 배치 기록 샘플</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f4_8')">
+            <input type="file" id="f4_8" onchange="markUploaded('f4_8','ci4_8','s4_8')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s4_8">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep(4)">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(4)">Next: Halal Management System →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 5: HAS/SJPH ========== -->
+  <div class="page" id="page5">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 5</span>
+        <span class="panel-title">Halal Management System <span class="panel-title-kr">할랄 관리 시스템 HAS/SJPH</span></span>
+      </div>
+      <div class="panel-body">
+        <div class="section-title">Core HAS Documents 핵심 HAS 문서</div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_1">!</div>
+          <div class="check-label" style="flex:1;">Halal Policy Declaration<span class="check-label-kr">할랄 방침 선언문</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_1')">
+            <input type="file" id="f5_1" onchange="markUploaded('f5_1','ci5_1','s5_1')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_1">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_2">!</div>
+          <div class="check-label" style="flex:1;">Halal Supervisor (PHT) Appointment Document<span class="check-label-kr">할랄 담당자 지정 문서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Penyelia Halal — required under UU No.33/2014.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_2')">
+            <input type="file" id="f5_2" onchange="markUploaded('f5_2','ci5_2','s5_2')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_2">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_3">!</div>
+          <div class="check-label" style="flex:1;">Halal Training Records<span class="check-label-kr">할랄 교육 기록</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_3')">
+            <input type="file" id="f5_3" onchange="markUploaded('f5_3','ci5_3','s5_3')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_3">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_4">!</div>
+          <div class="check-label" style="flex:1;">Internal Halal Audit Records<span class="check-label-kr">내부 할랄 감사 기록</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_4')">
+            <input type="file" id="f5_4" onchange="markUploaded('f5_4','ci5_4','s5_4')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_4">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="section-title">Additional BPJPH Requirements 추가 요구사항</div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_5">!</div>
+          <div class="check-label" style="flex:1;">Halal Internal Audit Checklist (SJPH)<span class="check-label-kr">내부 할랄 감사 체크리스트 (SJPH 양식)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_5')">
+            <input type="file" id="f5_5" onchange="markUploaded('f5_5','ci5_5','s5_5')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_5">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_6">!</div>
+          <div class="check-label" style="flex:1;">Halal Crisis Management Procedure<span class="check-label-kr">할랄 위기관리 절차서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Procedure for handling halal violations or contamination events.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_6')">
+            <input type="file" id="f5_6" onchange="markUploaded('f5_6','ci5_6','s5_6')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_6">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_7">!</div>
+          <div class="check-label" style="flex:1;">Supply Chain Management Records<span class="check-label-kr">공급망 관리 기록</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Records of approved halal supplier list and purchase documentation.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_7')">
+            <input type="file" id="f5_7" onchange="markUploaded('f5_7','ci5_7','s5_7')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_7">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci5_8">!</div>
+          <div class="check-label" style="flex:1;">Product Recall Procedure (Halal-related)<span class="check-label-kr">제품 리콜 절차 (할랄 관련)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f5_8')">
+            <input type="file" id="f5_8" onchange="markUploaded('f5_8','ci5_8','s5_8')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s5_8">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep(5)">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(5)">Next: Labeling →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 6: Labeling ========== -->
+  <div class="page" id="page6">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 6</span>
+        <span class="panel-title">Label & Packaging <span class="panel-title-kr">라벨·패키징</span></span>
+      </div>
+      <div class="panel-body">
+        <div class="section-title">Label Documents 라벨 서류</div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_1">!</div>
+          <div class="check-label" style="flex:1;">Label Draft / Artwork<span class="check-label-kr">라벨 시안</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_1')">
+            <input type="file" id="f6_1" onchange="markUploaded('f6_1','ci6_1','s6_1')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_1">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_2">!</div>
+          <div class="check-label" style="flex:1;">Ingredient Labeling on Package<span class="check-label-kr">패키지 성분 표기</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Must match submitted ingredient list exactly.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_2')">
+            <input type="file" id="f6_2" onchange="markUploaded('f6_2','ci6_2','s6_2')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_2">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_3">!</div>
+          <div class="check-label" style="flex:1;">Halal Logo Usage Plan<span class="check-label-kr">할랄 로고 사용 계획서</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_3')">
+            <input type="file" id="f6_3" onchange="markUploaded('f6_3','ci6_3','s6_3')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_3">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="section-title">Additional BPJPH Requirements 추가 요구사항</div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_4">!</div>
+          <div class="check-label" style="flex:1;">Packaging Material Composition Sheet<span class="check-label-kr">포장재 성분 명세서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Packaging materials must not contain prohibited substances.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_4')">
+            <input type="file" id="f6_4" onchange="markUploaded('f6_4','ci6_4','s6_4')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_4">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_5">!</div>
+          <div class="check-label" style="flex:1;">Multilingual Label (Bahasa Indonesia required)<span class="check-label-kr">다국어 라벨 (인도네시아어 포함 필수)</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">BPJPH requires Bahasa Indonesia on all labels for Indonesian market.</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_5')">
+            <input type="file" id="f6_5" onchange="markUploaded('f6_5','ci6_5','s6_5')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_5">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_6">!</div>
+          <div class="check-label" style="flex:1;">Halal Logo Approval Application (BPJPH Form)<span class="check-label-kr">할랄 로고 승인 신청서 (BPJPH 양식)</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_6')">
+            <input type="file" id="f6_6" onchange="markUploaded('f6_6','ci6_6','s6_6')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_6">Not uploaded</span>
+          </label>
+        </div>
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci6_7">!</div>
+          <div class="check-label" style="flex:1;">Product Net Weight / Volume Declaration<span class="check-label-kr">제품 순 중량/용량 표기 선언서</span></div>
+          <label class="upload-zone" onclick="triggerUpload('f6_7')">
+            <input type="file" id="f6_7" onchange="markUploaded('f6_7','ci6_7','s6_7')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s6_7">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn btn-ghost" onclick="prevStep(6)">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(6)">Generate Risk Branch Report →</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ========== STEP 7: Final Risk Branch Report ========== -->
+  <div class="page" id="page7">
+    <div id="finalReport"></div>
+  </div>
+
+</div><!-- /container -->
+
+<script>
+// ============================================================
+// RULE DB v0.4 — STOP + HOLD only | INCI aliases 강화
+// DB에 없는 성분 = 기본값 PASS
+// Source: UU No.33/2014, MUI Fatwa, HAS 23000:2020, SNI 99002:2016
+// ============================================================
+const RULE_DB = {
+  version: "0.4-sample",
+  rules: [
+    // ── STOP: 돼지 유래 ──
+    { id:"R001", canonical:"Porcine Gelatin",
+      aliases:["porcine gelatin","gelatin (pork)","pig gelatin","swine gelatin","gelatin","gelatine","hydrolyzed gelatin","hydrolysed gelatin","gelatin hydrolysate","collagen hydrolysate (porcine)","sus scrofa collagen","porcine hide gelatin","porcine bone gelatin","돼지 젤라틴","돼지 유래 젤라틴","gelatin babi"],
+      status:"STOP", category:"Porcine-derived",
+      reason_en:"Flagged as porcine (pig) derived — classified as non-compliant in this preliminary review per UU No.33/2014. Requires regulatory confirmation.",
+      reason_kr:"돼지 유래로 분류 — 본 사전 검토 엔진 기준 비적합 판정. 규정 확인 필요.",
+      rule_ref:"UU No.33/2014 Pasal 18(1); MUI Fatwa No.12/2009",
+      article_text:"UU No.33/2014 Pasal 18(1): Bahan yang berasal dari babi dan turunannya dilarang digunakan dalam produk halal.",
+      guide_en:"Reformulation recommended: fish gelatin, bovine gelatin (halal cert), agar, carrageenan, pectin, or konjac.",
+      guide_kr:"성분 재구성 권장: 어류 젤라틴, 할랄 인증 소 유래 젤라틴, 한천, 카라기난, 펙틴, 곤약.",
+      replaceable:true },
+
+    { id:"R002", canonical:"Lard",
+      aliases:["lard","pig fat","pork fat","adeps suillus","adeps porci","pork grease","porcine fat","porcine lipid","porcine tallow","sus scrofa fat","rendered pork fat","돼지기름","라드","돼지 지방","lemak babi","gajih babi"],
+      status:"STOP", category:"Porcine-derived",
+      reason_en:"Flagged as porcine-derived fat — classified as non-compliant in this preliminary review. Requires regulatory confirmation.",
+      reason_kr:"돼지 유래 지방으로 분류 — 본 사전 검토 엔진 기준 비적합 판정.",
+      rule_ref:"UU No.33/2014 Pasal 18(1)",
+      article_text:"UU No.33/2014 Pasal 18(1): Bahan yang berasal dari babi dan turunannya dilarang.",
+      guide_en:"Reformulation recommended: vegetable oils (palm, coconut, sunflower) or bovine tallow with halal certificate.",
+      guide_kr:"성분 재구성 권장: 식물성 오일(팜, 코코넛, 해바라기) 또는 할랄 인증 소 유지.",
+      replaceable:true },
+
+    { id:"R003", canonical:"Porcine Collagen",
+      aliases:["porcine collagen","pig collagen","collagen (pork)","porcine hide collagen","porcine bone collagen","sus scrofa collagen","porcine collagen peptide","porcine soluble collagen","돼지 콜라겐","돼지 유래 콜라겐","kolagen babi"],
+      status:"STOP", category:"Porcine-derived",
+      reason_en:"Flagged as porcine-derived collagen — classified as non-compliant in this preliminary review.",
+      reason_kr:"돼지 유래 콜라겐으로 분류 — 본 사전 검토 엔진 기준 비적합 판정.",
+      rule_ref:"UU No.33/2014 Pasal 18(1)",
+      article_text:"UU No.33/2014 Pasal 18(1): Bahan yang berasal dari babi dan turunannya dilarang.",
+      guide_en:"Reformulation recommended: marine collagen (fish) or bovine collagen with halal certificate.",
+      guide_kr:"성분 재구성 권장: 해양(어류) 콜라겐 또는 할랄 인증 소 유래 콜라겐.",
+      replaceable:true },
+
+    { id:"R004", canonical:"Porcine Placenta",
+      aliases:["porcine placenta","pig placenta","placenta extract (pork)","sus scrofa placenta","porcine placenta extract","돼지 태반","돼지 태반 추출물","plasenta babi"],
+      status:"STOP", category:"Porcine-derived",
+      reason_en:"Flagged as porcine placenta extract — classified as non-compliant in this preliminary review.",
+      reason_kr:"돼지 태반 추출물로 분류 — 본 사전 검토 엔진 기준 비적합 판정.",
+      rule_ref:"UU No.33/2014 Pasal 18(1)",
+      article_text:"UU No.33/2014 Pasal 18(1): Bahan yang berasal dari babi dan turunannya dilarang.",
+      guide_en:"Reformulation recommended: plant-based placenta alternatives or EGF (confirmed halal).",
+      guide_kr:"성분 재구성 권장: 식물성 태반 대체제 또는 EGF(할랄 확인).",
+      replaceable:true },
+
+    { id:"R005", canonical:"Pork-derived Hyaluronic Acid",
+      aliases:["hyaluronic acid (porcine)","sodium hyaluronate (pork)","porcine hyaluronic acid","porcine sodium hyaluronate","ha (porcine)","hyaluronan (porcine)","돼지 유래 히알루론산","asam hialuronat babi"],
+      status:"STOP", category:"Porcine-derived",
+      reason_en:"Flagged as porcine-derived hyaluronic acid — classified as non-compliant in this preliminary review.",
+      reason_kr:"돼지 유래 히알루론산으로 분류 — 본 사전 검토 엔진 기준 비적합 판정.",
+      rule_ref:"UU No.33/2014 Pasal 18(1)",
+      article_text:"UU No.33/2014 Pasal 18(1): Bahan yang berasal dari babi dan turunannya dilarang.",
+      guide_en:"Reformulation recommended: microbial fermentation-derived HA with confirmed halal fermentation medium.",
+      guide_kr:"성분 재구성 권장: 미생물 발효 유래 히알루론산 (할랄 발효 배지 확인).",
+      replaceable:true },
+
+    // ── STOP: 곤충 유래 ──
+    { id:"R006", canonical:"Carmine",
+      aliases:["carmine","cochineal","e120","ci 75470","carminic acid","natural red 4","cochineal extract","dactylopius coccus","carmine lake","crimson lake","carmine dye","카민","코치닐","카민산","코치닐 색소"],
+      status:"STOP", category:"Insect-derived",
+      reason_en:"Flagged as insect-derived colorant (cochineal) — classified as high-risk in this preliminary review per MUI Fatwa No.33/2011. Requires regulatory confirmation for BPJPH pathway.",
+      reason_kr:"곤충 유래 색소(코치닐)로 분류 — 본 사전 검토 기준 고위험 판정. BPJPH 경로 규정 확인 필요.",
+      rule_ref:"MUI Fatwa No.33/2011; SNI 99002:2016",
+      article_text:"MUI Fatwa No.33/2011: Serangga dan produk turunannya dihukumi haram kecuali yang dikecualikan secara khusus.",
+      guide_en:"Reformulation recommended: beetroot red (E162), annatto (E160b), paprika extract (E160c), or iron oxides.",
+      guide_kr:"성분 재구성 권장: 비트루트 레드(E162), 아나토(E160b), 파프리카 추출물(E160c), 산화철.",
+      replaceable:true },
+
+    { id:"R007", canonical:"Shellac",
+      aliases:["shellac","lac resin","e904","shellac resin","lac","laccifer lacca","shellac wax","dewaxed shellac","bleached shellac","orange shellac","셸락","락 수지","셸락 수지"],
+      status:"STOP", category:"Insect-derived",
+      reason_en:"Flagged as insect-derived (lac insect) — classified as high-risk in this preliminary review per MUI Fatwa No.33/2011. Requires regulatory confirmation.",
+      reason_kr:"곤충 유래(락 곤충)로 분류 — 본 사전 검토 기준 고위험 판정. 규정 확인 필요.",
+      rule_ref:"MUI Fatwa No.33/2011",
+      article_text:"MUI Fatwa No.33/2011: Serangga dan produk turunannya dihukumi haram.",
+      guide_en:"Reformulation recommended: carnauba wax (E903), candelilla wax, or synthetic film-formers.",
+      guide_kr:"성분 재구성 권장: 카르나우바 왁스(E903), 칸델릴라 왁스, 또는 합성 성막제.",
+      replaceable:true },
+
+    { id:"R008", canonical:"Beeswax",
+      aliases:["beeswax","cera alba","cera flava","e901","white beeswax","yellow beeswax","bleached beeswax","apis mellifera wax","honeybee wax","bee wax","밀랍","비즈왁스","꿀벌 왁스","lilin lebah"],
+      status:"STOP", category:"Insect-derived",
+      reason_en:"Flagged as bee-derived wax — classified as high-risk in this preliminary review under BPJPH insect-derived classification (Keputusan No.57/2021). Requires regulatory confirmation.",
+      reason_kr:"꿀벌 유래 왁스로 분류 — BPJPH 곤충 유래 분류 기준 고위험 판정(Keputusan No.57/2021). 규정 확인 필요.",
+      rule_ref:"MUI Fatwa No.33/2011; BPJPH Keputusan No.57/2021",
+      article_text:"BPJPH Keputusan No.57/2021: Bahan yang berasal dari serangga termasuk beeswax dinyatakan tidak halal.",
+      guide_en:"Reformulation recommended: carnauba wax, candelilla wax, rice bran wax, or synthetic waxes.",
+      guide_kr:"성분 재구성 권장: 카르나우바 왁스, 칸델릴라 왁스, 쌀겨 왁스, 또는 합성 왁스.",
+      replaceable:true },
+
+    { id:"R009", canonical:"Honey",
+      aliases:["honey","mel","mel extract","honey extract","honey powder","dried honey","raw honey","manuka honey","apis mellifera honey","꿀","벌꿀","꿀 추출물","꿀 분말","madu","ekstrak madu"],
+      status:"STOP", category:"Insect-derived",
+      reason_en:"Flagged as bee-derived ingredient — classified as high-risk in this preliminary review under BPJPH insect-derived classification. Requires regulatory confirmation.",
+      reason_kr:"꿀벌 유래 성분으로 분류 — BPJPH 곤충 유래 분류 기준 고위험 판정. 규정 확인 필요.",
+      rule_ref:"BPJPH Keputusan No.57/2021",
+      article_text:"BPJPH Keputusan No.57/2021: Produk lebah termasuk madu diklasifikasikan sebagai bahan tidak halal.",
+      guide_en:"Reformulation recommended: plant-based humectants — glycerin (plant/synthetic), aloe vera, panthenol, sorbitol.",
+      guide_kr:"성분 재구성 권장: 식물성 보습제 — 식물성/합성 글리세린, 알로에베라, 판테놀, 소르비톨.",
+      replaceable:true },
+
+    { id:"R010", canonical:"Propolis",
+      aliases:["propolis","propolis extract","bee propolis","propolis resin","propolis wax","propolis tincture","프로폴리스","프로폴리스 추출물","ekstrak propolis"],
+      status:"STOP", category:"Insect-derived",
+      reason_en:"Flagged as bee-derived substance — classified as high-risk in this preliminary review under BPJPH insect-derived classification. Requires regulatory confirmation.",
+      reason_kr:"꿀벌 유래 물질로 분류 — BPJPH 곤충 유래 분류 기준 고위험 판정. 규정 확인 필요.",
+      rule_ref:"BPJPH Keputusan No.57/2021",
+      article_text:"BPJPH Keputusan No.57/2021: Produk lebah termasuk propolis diklasifikasikan tidak halal.",
+      guide_en:"Reformulation recommended: plant antimicrobials — tea tree oil, neem extract, rosemary extract.",
+      guide_kr:"성분 재구성 권장: 식물성 항균 성분 — 티트리 오일, 님 추출물, 로즈마리 추출물.",
+      replaceable:true },
+
+    { id:"R011", canonical:"Placenta Extract (unverified)",
+      aliases:["placenta extract","animal placenta","placental extract","placenta hydrolysate","placenta protein","soluble placenta","태반 추출물","동물 태반","ekstrak plasenta","plasenta hewani"],
+      status:"STOP", category:"Animal-derived (non-halal)",
+      reason_en:"Flagged as animal placenta without halal slaughter confirmation — classified as non-compliant in this preliminary review pending documentary confirmation.",
+      reason_kr:"할랄 도축 확인 없는 동물 태반으로 분류 — 서류 확인 전까지 본 사전 검토 기준 비적합 판정.",
+      rule_ref:"UU No.33/2014 Pasal 17; HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020 Section 4.2: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"To resolve: provide species confirmation (non-porcine) + halal slaughter cert + processing documentation.",
+      guide_kr:"해결 방법: 종 확인(비돼지) + 할랄 도축 인증서 + 가공 방법 문서 제출.",
+      replaceable:false },
+
+    // ── HOLD: 알코올류 ──
+    { id:"R012", canonical:"Ethanol",
+      aliases:["ethanol","ethyl alcohol","alcohol denat","alcohol","denatured alcohol","sd alcohol","sd alcohol 40","sd alcohol 39-c","sd alcohol 40-b","specially denatured alcohol","anhydrous ethanol","absolute alcohol","grain alcohol","fermentation alcohol","에탄올","에틸알코올","알코올","변성 알코올","알코올 데나트"],
+      status:"HOLD", category:"Alcohol",
+      reason_en:"Conditionally permitted in cosmetics if not khamr-derived. Origin declaration mandatory.",
+      reason_kr:"발효 음료(캄르) 유래가 아닌 경우 화장품에 조건부 허용. 원료 유래 선언서 필수.",
+      rule_ref:"MUI Fatwa No.11/2009; Permenag No.26/2019 Pasal 3",
+      article_text:"MUI Fatwa No.11/2009: Alkohol/etanol yang bukan berasal dari industri khamar boleh digunakan sebagai pelarut dalam kosmetik.",
+      guide_en:"Required: (1) Origin declaration — NOT khamr-derived, (2) Concentration % docs, (3) Supplier CoA.",
+      guide_kr:"필요: (1) 유래 선언서(캄르 유래 아님), (2) 함량(%) 문서, (3) 공급사 CoA.",
+      replaceable:false },
+
+    { id:"R013", canonical:"Isopropyl Alcohol",
+      aliases:["isopropyl alcohol","isopropanol","ipa","propan-2-ol","2-propanol","rubbing alcohol","이소프로필알코올","이소프로판올","알코올 이소프로필"],
+      status:"HOLD", category:"Alcohol",
+      reason_en:"Synthetic alcohol. Confirm synthetic (non-khamr) origin.",
+      reason_kr:"합성 알코올. 합성(비캄르) 유래 확인.",
+      rule_ref:"MUI Fatwa No.11/2009",
+      article_text:"MUI Fatwa No.11/2009: Alkohol sintetis yang tidak berasal dari industri khamar diperbolehkan.",
+      guide_en:"Required: Supplier declaration confirming synthetic (petrochemical) origin.",
+      guide_kr:"필요: 합성(석유화학) 유래 확인 공급사 선언서.",
+      replaceable:false },
+
+    { id:"R014", canonical:"Benzyl Alcohol",
+      aliases:["benzyl alcohol","phenylmethanol","benzenemethanol","alpha-hydroxytoluene","phenylcarbinol","벤질알코올","페닐메탄올"],
+      status:"HOLD", category:"Alcohol",
+      reason_en:"Natural resin or synthetic. Confirmation of non-khamr origin required.",
+      reason_kr:"천연 수지 또는 합성 유래. 비캄르 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang mengandung alkohol harus diverifikasi sumbernya.",
+      guide_en:"Required: Origin declaration. Halal certificate preferred.",
+      guide_kr:"필요: 유래 선언서. 할랄 인증서 권장.",
+      replaceable:false },
+
+    // ── HOLD: 글리세린류 ──
+    { id:"R015", canonical:"Glycerin",
+      aliases:["glycerin","glycerol","e422","glycerine","vegetable glycerin","plant glycerin","plant-derived glycerin","glycerin usp","glycerol 99%","glycerine bp","glycerol (vegetable)","glycerol (animal)","synthetic glycerin","1,2,3-propanetriol","글리세린","글리세롤","글리세린 (식물성)","gliserin","gliserol"],
+      status:"HOLD", category:"Glycerin",
+      reason_en:"May be animal, vegetable, or synthetic. Origin confirmation mandatory.",
+      reason_kr:"동물/식물/합성 유래 가능. 원료 유래 확인 필수.",
+      rule_ref:"HAS 23000:2020 Section 4.2; MUI Fatwa No.12/2009",
+      article_text:"HAS 23000:2020 Section 4.2: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: (1) Origin declaration (plant/synthetic preferred), (2) If animal: halal slaughter cert.",
+      guide_kr:"필요: (1) 유래 선언서(식물성/합성 권장), (2) 동물 유래 시: 할랄 도축 인증서.",
+      replaceable:false },
+
+    { id:"R016", canonical:"Propylene Glycol",
+      aliases:["propylene glycol","1,2-propanediol","pg","propan-1,2-diol","methylethylene glycol","프로필렌글리콜","프로필렌 글리콜","propilena glikol"],
+      status:"HOLD", category:"Glycerin",
+      reason_en:"Typically synthetic (petrochemical). Confirm not bio-derived from non-halal fermentation.",
+      reason_kr:"통상 합성(석유화학) 유래. 비할랄 발효 바이오 기반이 아님을 확인.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan sintetis harus diverifikasi bahwa bukan berasal dari sumber yang haram.",
+      guide_en:"Required: Supplier declaration confirming petrochemical origin.",
+      guide_kr:"필요: 석유화학(합성) 유래 확인 공급사 선언서.",
+      replaceable:false },
+
+    { id:"R017", canonical:"Butylene Glycol",
+      aliases:["butylene glycol","1,3-butanediol","bg","1,3-butylene glycol","butane-1,3-diol","부틸렌글리콜","부틸렌 글리콜","butil gliserin"],
+      status:"HOLD", category:"Glycerin",
+      reason_en:"May be synthetic or bio-fermentation derived. Origin confirmation required.",
+      reason_kr:"합성 또는 바이오 발효 유래 가능. 원료 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari fermentasi harus diverifikasi media fermentasinya.",
+      guide_en:"Required: Origin declaration. If bio-based: halal fermentation medium confirmation.",
+      guide_kr:"필요: 유래 선언서. 바이오 기반 시: 할랄 발효 배지 확인.",
+      replaceable:false },
+
+    { id:"R018", canonical:"Pentylene Glycol",
+      aliases:["pentylene glycol","1,2-pentanediol","pentane-1,2-diol","펜틸렌글리콜","펜틸렌 글리콜"],
+      status:"HOLD", category:"Glycerin",
+      reason_en:"May be bio-derived (sugarcane) or synthetic. Confirmation required.",
+      reason_kr:"사탕수수 바이오 유래 또는 합성 가능. 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari fermentasi harus diverifikasi.",
+      guide_en:"Required: Origin declaration (plant or synthetic).",
+      guide_kr:"필요: 유래 선언서(식물성 또는 합성).",
+      replaceable:false },
+
+    // ── HOLD: 발효 유래 ──
+    { id:"R019", canonical:"Lactic Acid",
+      aliases:["lactic acid","e270","l-lactic acid","l(+)-lactic acid","d-lactic acid","dl-lactic acid","2-hydroxypropanoic acid","milk acid","sarcolactic acid","젖산","락틱산","l-젖산","asam laktat"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Produced via microbial fermentation. Medium must be halal-certified.",
+      reason_kr:"미생물 발효 생산. 발효 배지 할랄 인증 필요.",
+      rule_ref:"MUI Fatwa No.12/2009; HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan hasil fermentasi harus menggunakan media fermentasi yang halal.",
+      guide_en:"Required: (1) Halal fermentation medium declaration, (2) No porcine components, (3) CoA.",
+      guide_kr:"필요: (1) 할랄 발효 배지 선언서, (2) 돼지 유래 성분 없음, (3) CoA.",
+      replaceable:false },
+
+    { id:"R020", canonical:"Sodium Lactate",
+      aliases:["sodium lactate","e325","sodium l-lactate","lactic acid sodium salt","소듐 락테이트","젖산나트륨","나트륨 락테이트","natrium laktat"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Salt of lactic acid. Same fermentation origin concern.",
+      reason_kr:"젖산의 염. 동일한 발효 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan hasil fermentasi harus menggunakan media fermentasi yang halal.",
+      guide_en:"Required: Fermentation medium confirmation + halal certificate.",
+      guide_kr:"필요: 발효 배지 확인 + 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R021", canonical:"Hyaluronic Acid",
+      aliases:["hyaluronic acid","sodium hyaluronate","ha","hyaluronan","sodium hyaluronate crosspolymer","hydrolyzed hyaluronic acid","acetyl glucosamine","hyaluronic acid (fermentation)","sodium hyaluronate (fermentation)","히알루론산","소듐 히알루로네이트","히알루론산 나트륨","asam hialuronat","natrium hialuronat"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Microbial fermentation. Confirm halal medium and no animal-derived nutrients.",
+      reason_kr:"미생물 발효. 할랄 발효 배지 및 동물 유래 영양분 미사용 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan hasil fermentasi harus menggunakan media fermentasi yang halal.",
+      guide_en:"Required: (1) Microbial origin (not porcine rooster comb), (2) Halal fermentation medium cert, (3) Halal cert.",
+      guide_kr:"필요: (1) 미생물 유래 확인(돼지/수탉 볏 아님), (2) 할랄 발효 배지 인증, (3) 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R022", canonical:"Niacinamide",
+      aliases:["niacinamide","nicotinamide","vitamin b3","vitamin b-3","pyridine-3-carboxamide","3-pyridinecarboxamide","nicotinic acid amide","나이아신아마이드","니코틴아마이드","비타민 B3","니아신아미드","niasinamid"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"May be synthetic or fermentation-derived. If fermented, halal medium required.",
+      reason_kr:"합성 또는 발효 유래 가능. 발효 유래 시 할랄 배지 필요.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari fermentasi harus diverifikasi.",
+      guide_en:"Required: Origin declaration (synthetic preferred). If fermented: halal medium cert.",
+      guide_kr:"필요: 유래 선언서(합성 권장). 발효 유래 시: 할랄 배지 인증.",
+      replaceable:false },
+
+    { id:"R023", canonical:"Panthenol",
+      aliases:["panthenol","provitamin b5","dl-panthenol","d-panthenol","d-pantothenol","dexpanthenol","pantothenol","panthenyl","pro-vitamin b5","판테놀","프로비타민 B5","덱스판테놀","판토텐올"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Typically synthetic but some grades fermentation-derived. Confirm origin.",
+      reason_kr:"통상 합성 유래이나 일부 등급은 발효 유래. 확인 필요.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan sintetis harus diverifikasi sumbernya.",
+      guide_en:"Required: Supplier declaration confirming synthetic origin.",
+      guide_kr:"필요: 합성 유래 확인 공급사 선언서.",
+      replaceable:false },
+
+    { id:"R024", canonical:"Xanthan Gum",
+      aliases:["xanthan gum","e415","xanthan","xanthomonas campestris gum","corn sugar gum","잔탄검","잔탄 검","xantan gum","gom xantan"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Bacterial fermentation of Xanthomonas campestris. Medium must be halal.",
+      reason_kr:"Xanthomonas campestris 박테리아 발효. 발효 배지 할랄 확인 필요.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan hasil fermentasi harus menggunakan media fermentasi yang halal.",
+      guide_en:"Required: (1) Halal fermentation medium, (2) No animal nutrients, (3) Halal cert.",
+      guide_kr:"필요: (1) 할랄 발효 배지, (2) 동물 유래 영양분 없음, (3) 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R025", canonical:"Galactomyces Ferment Filtrate",
+      aliases:["galactomyces ferment filtrate","galactomyces ferment","galactomyces fermentation filtrate","yeast ferment filtrate","saccharomyces ferment filtrate","pitera","갈락토미세스 발효 여과액","갈락토미세스 발효물","효모 발효 여과물"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Yeast fermentation filtrate. Medium must be halal-verified.",
+      reason_kr:"효모 발효 여과액. 발효 배지 할랄 검증 필요.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan hasil fermentasi harus menggunakan media fermentasi yang halal.",
+      guide_en:"Required: Fermentation medium declaration (no animal-derived nutrients). Halal cert.",
+      guide_kr:"필요: 발효 배지 선언서(동물 유래 영양분 없음). 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R026", canonical:"Bifida Ferment Lysate",
+      aliases:["bifida ferment lysate","lactobacillus ferment","lactobacillus ferment lysate","bifidobacterium ferment","bifidus ferment","probiotic ferment","비피다 발효 용해물","유산균 발효물","락토바실러스 발효물","lysate fermentasi"],
+      status:"HOLD", category:"Fermentation-derived",
+      reason_en:"Probiotic fermentation. Culture medium confirmation required.",
+      reason_kr:"프로바이오틱 발효. 배양 배지 확인 필요.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan hasil fermentasi harus menggunakan media fermentasi yang halal.",
+      guide_en:"Required: Medium declaration (no animal-derived culture medium). Halal cert.",
+      guide_kr:"필요: 배지 선언서(동물 유래 배양 배지 없음). 할랄 인증서.",
+      replaceable:false },
+
+    // ── HOLD: 향료 ──
+    { id:"R027", canonical:"Fragrance",
+      aliases:["fragrance","parfum","perfume","aroma","flavor","flavour","fragrance oil","essential oil blend","fragrance compound","scent","향료","향","향수","아로마","프래그런스","wewangian","parfum sintetis","aroma buatan"],
+      status:"HOLD", category:"Fragrance",
+      reason_en:"Complex mixture potentially containing alcohol or animal-derived components. Halal cert mandatory.",
+      reason_kr:"알코올 또는 동물 유래 성분 포함 가능한 복합 혼합물. 할랄 인증서 필수.",
+      rule_ref:"HAS 23000:2020 Section 4.3",
+      article_text:"HAS 23000:2020 Section 4.3: Bahan pewangi yang kompleks harus disertai daftar lengkap komponen dan sertifikat halal.",
+      guide_en:"Required: (1) Full ingredient breakdown, (2) Halal cert, (3) No khamr-derived alcohol.",
+      guide_kr:"필요: (1) 전성분 목록, (2) 할랄 인증서, (3) 캄르 유래 알코올 부재 확인.",
+      replaceable:false },
+
+    // ── HOLD: 동물 유래 조건부 ──
+    { id:"R028", canonical:"Collagen",
+      aliases:["collagen","soluble collagen","hydrolyzed collagen","hydrolysed collagen","collagen peptide","collagen hydrolysate","marine collagen","fish collagen","bovine collagen","collagen extract","soluble fish collagen","collagen (bovine)","collagen (marine)","콜라겐","가수분해 콜라겐","콜라겐 펩타이드","해양 콜라겐","bovine collagen peptide","kolagen","kolagen ikan","kolagen sapi"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Origin critical: marine (fish) OK with docs. Bovine needs halal slaughter cert. Porcine = STOP.",
+      reason_kr:"원료 유래 중요: 해양(어류) 서류 포함 허용. 소 유래 할랄 도축 인증 필요. 돼지 = STOP.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: (1) Species declaration (fish or bovine — NOT porcine), (2) If bovine: halal slaughter cert.",
+      guide_kr:"필요: (1) 종 선언서(어류 또는 소 — 돼지 금지), (2) 소 유래: 할랄 도축 인증서.",
+      replaceable:false },
+
+    { id:"R029", canonical:"Keratin",
+      aliases:["keratin","hydrolyzed keratin","hydrolysed keratin","keratin protein","keratin amino acids","wheat keratin","sheep keratin","wool keratin","케라틴","가수분해 케라틴","케라틴 단백질","케라틴 아미노산","keratin terhidrolisis"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Animal hair/wool/feathers. Species and processing must be confirmed.",
+      reason_kr:"동물 털/양모/깃털 유래. 종 및 가공 방법 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Species declaration (wool/feather — not porcine) + halal cert.",
+      guide_kr:"필요: 종 선언서(양모/깃털 — 돼지 금지) + 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R030", canonical:"Squalene / Squalane",
+      aliases:["squalene","squalane","shark liver oil squalene","shark squalene","olive squalane","sugarcane squalane","plant squalane","phytosqualane","스쿠알렌","스쿠알란","올리브 스쿠알란","식물성 스쿠알란","skualen","skualan"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Traditionally shark-derived. Plant-derived (olive/sugarcane) preferred with documentation.",
+      reason_kr:"전통적으로 상어 유래. 식물성(올리브/사탕수수) 서류 포함 권장.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration (plant preferred). If shark-derived: species + halal processing docs.",
+      guide_kr:"필요: 유래 선언서(식물성 권장). 상어 유래: 종 확인 + 할랄 가공 문서.",
+      replaceable:false },
+
+    { id:"R031", canonical:"Lanolin",
+      aliases:["lanolin","wool wax","wool grease","lanolin alcohol","anhydrous lanolin","liquid lanolin","lanolin oil","acetylated lanolin","ethoxylated lanolin","hydrogenated lanolin","라놀린","울왁스","양모 지방","라놀린 알코올","lanolin domba"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Sheep wool grease. Sourcing and processing method must be confirmed.",
+      reason_kr:"양 양모 유지. 수급 및 가공 방법 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: (1) Non-porcine (sheep) confirmation, (2) Supplier compliance declaration, (3) Halal cert.",
+      guide_kr:"필요: (1) 비돼지(양) 확인, (2) 공급사 적합성 선언서, (3) 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R032", canonical:"Milk Proteins / Whey",
+      aliases:["milk protein","whey protein","casein","lactalbumin","lactoglobulin","whey","sodium caseinate","calcium caseinate","hydrolyzed milk protein","milk extract","milk powder","dried milk","whole milk powder","우유 단백질","유청 단백질","카세인","유청","락토글로불린","protein susu","whey protein isolate"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Bovine milk-derived. Confirm no porcine enzymes in processing.",
+      reason_kr:"소 우유 유래. 가공 시 돼지 유래 효소 미사용 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dibuktikan kehalalannya.",
+      guide_en:"Required: (1) Bovine source confirmation, (2) No porcine enzyme declaration, (3) Halal cert.",
+      guide_kr:"필요: (1) 소 유래 확인, (2) 돼지 유래 효소 없음 선언, (3) 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R033", canonical:"Elastin",
+      aliases:["elastin","hydrolyzed elastin","hydrolysed elastin","soluble elastin","elastin protein","bovine elastin","엘라스틴","가수분해 엘라스틴","소 엘라스틴","elastin terhidrolisis"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Animal connective tissue protein. Origin must be confirmed.",
+      reason_kr:"동물 결합조직 단백질. 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Species declaration + halal processing certificate.",
+      guide_kr:"필요: 종 선언서 + 할랄 가공 인증서.",
+      replaceable:false },
+
+    { id:"R034", canonical:"Carnitine",
+      aliases:["carnitine","l-carnitine","acetyl l-carnitine","acetyl-l-carnitine","levocarnitine","l-carnitine tartrate","carnitine hydrochloride","카르니틴","엘카르니틴","아세틸 엘카르니틴","karnitin"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"May be animal (muscle tissue) or synthetic. Origin confirmation required.",
+      reason_kr:"동물 근육조직 또는 합성 유래 가능. 원료 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration (synthetic preferred). If animal: halal slaughter cert.",
+      guide_kr:"필요: 유래 선언서(합성 권장). 동물 유래: 할랄 도축 인증서.",
+      replaceable:false },
+
+    { id:"R035", canonical:"Snail Secretion Filtrate",
+      aliases:["snail secretion filtrate","snail mucin","snail extract","snail slime","cryptomphalus aspersa secretion","helix aspersa extract","snail filtrate","달팽이 분비물 여과액","달팽이 점액","달팽이 추출물","ekstrak siput"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Snail-derived. Halal status debated — BPJPH official ruling required.",
+      reason_kr:"달팽이 유래. 할랄 여부 논쟁 — BPJPH 공식 판결 확인 필요.",
+      rule_ref:"MUI Fatwa No.33/2011",
+      article_text:"MUI Fatwa No.33/2011: Status hewan kecil selain serangga perlu diverifikasi dengan ulama setempat.",
+      guide_en:"Consult BPJPH for current official ruling. Halal cert required.",
+      guide_kr:"BPJPH 현행 공식 판결 확인 필요. 할랄 인증서 필수.",
+      replaceable:false },
+
+    { id:"R036", canonical:"Hydrolyzed Silk",
+      aliases:["hydrolyzed silk","hydrolysed silk","silk amino acids","silk protein","sericin","fibroin","silk extract","silk peptide","hydrolyzed silk protein","가수분해 실크","실크 아미노산","실크 단백질","실크 펩타이드","세리신","sutra terhidrolisis","protein sutra"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Silkworm-derived. Status varies by scholar — BPJPH verification needed.",
+      reason_kr:"누에 유래. 학자별 견해 차이 — BPJPH 검증 필요.",
+      rule_ref:"MUI Fatwa No.33/2011",
+      article_text:"MUI Fatwa No.33/2011: Serangga dan produk turunannya — status bervariasi tergantung ulama.",
+      guide_en:"Consult BPJPH/MUI for current ruling. Document source + obtain halal cert.",
+      guide_kr:"BPJPH/MUI 현행 판결 확인. 원산지 서류화 + 할랄 인증 취득.",
+      replaceable:false },
+
+    { id:"R037", canonical:"Ceramide",
+      aliases:["ceramide","ceramide np","ceramide ap","ceramide eop","ceramide ng","ceramide as","ceramide 1","ceramide 2","ceramide 3","ceramide 6ii","phytosphingosine","sphingosine","ceramide (bovine)","ceramide (wheat)","ceramide (rice)","세라마이드","식물성 세라마이드","세라마이드 NP","ceramida","ceramide nabati"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"May be animal (bovine), plant (wheat/rice), or synthetic. Origin confirmation critical.",
+      reason_kr:"동물(소), 식물성(밀/쌀), 합성 유래 가능. 원료 유래 확인 중요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration (plant/synthetic preferred). If animal: halal cert.",
+      guide_kr:"필요: 유래 선언서(식물성/합성 권장). 동물 유래: 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R038", canonical:"Glucosamine",
+      aliases:["glucosamine","glucosamine hcl","glucosamine hydrochloride","glucosamine sulfate","n-acetyl glucosamine","d-glucosamine","shellfish glucosamine","글루코사민","N-아세틸 글루코사민","글루코사민 HCl","glukosamin"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Typically shellfish (shrimp/crab shell) derived. Confirm species and halal processing.",
+      reason_kr:"통상 갑각류(새우/게 껍질) 유래. 종 및 할랄 가공 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Source declaration. Plant/microbial-derived preferred. If shellfish: confirm halal processing.",
+      guide_kr:"필요: 원산지 선언서. 식물성/미생물 유래 권장. 갑각류: 할랄 가공 확인.",
+      replaceable:false },
+
+    { id:"R039", canonical:"Chondroitin Sulfate",
+      aliases:["chondroitin sulfate","chondroitin","chondroitin sodium sulfate","shark chondroitin","bovine chondroitin","콘드로이틴 황산","콘드로이틴","소 콘드로이틴","상어 콘드로이틴","kondroitin sulfat"],
+      status:"HOLD", category:"Animal-derived (conditional)",
+      reason_en:"Bovine/shark cartilage or porcine trachea. Porcine = STOP. Others need halal cert.",
+      reason_kr:"소/상어 연골 또는 돼지 기도 유래. 돼지 = STOP. 기타는 할랄 인증 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2; UU No.33/2014",
+      article_text:"HAS 23000:2020 + UU No.33: Bahan babi haram; bahan hewan lain harus dibuktikan halalnya.",
+      guide_en:"Required: Species declaration (bovine or marine ONLY — not porcine). If bovine: halal cert.",
+      guide_kr:"필요: 종 선언서(소 또는 해양 한정 — 돼지 금지). 소 유래: 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R040", canonical:"EGF (Epidermal Growth Factor)",
+      aliases:["egf","epidermal growth factor","sh-oligopeptide-1","human epidermal growth factor","recombinant egf","recombinant human egf","rhegf","biotechnology egf","상피세포성장인자","재조합 EGF","EGF 성장인자","faktor pertumbuhan epidermal"],
+      status:"HOLD", category:"Biotechnology-derived",
+      reason_en:"Recombinant fermentation. Cell line and culture medium must be halal-verified.",
+      reason_kr:"재조합 발효. 세포주 및 배양 배지 할랄 검증 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan bioteknologi harus diverifikasi sumber media fermentasinya.",
+      guide_en:"Required: (1) Cell line origin (non-animal/halal confirmed), (2) Medium declaration, (3) Halal cert.",
+      guide_kr:"필요: (1) 세포주 유래(비동물/할랄 확인), (2) 배지 선언서, (3) 할랄 인증서.",
+      replaceable:false },
+
+    // ── HOLD: 유화제류 ──
+    { id:"R041", canonical:"Stearic Acid",
+      aliases:["stearic acid","octadecanoic acid","e570","stearic acid (animal)","stearic acid (vegetable)","stearic acid (palm)","triple pressed stearic acid","스테아린산","스테아르산","팜 스테아린산","asam stearat","asam oktadekanoat"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Animal or vegetable-derived. Origin must be confirmed.",
+      reason_kr:"동물 또는 식물성 유래. 원료 유래 확인 필수.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration (vegetable/palm preferred). If animal: halal slaughter cert.",
+      guide_kr:"필요: 유래 선언서(식물성/팜 권장). 동물 유래: 할랄 도축 인증서.",
+      replaceable:false },
+
+    { id:"R042", canonical:"Palmitic Acid",
+      aliases:["palmitic acid","hexadecanoic acid","palmitic acid (palm)","팔미틱산","팔미트산","팜 팔미트산","asam palmitat","asam heksadekanoat"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Animal or vegetable-derived. Origin confirmation required.",
+      reason_kr:"동물 또는 식물성 유래. 원료 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration (palm oil-derived preferred).",
+      guide_kr:"필요: 유래 선언서(팜유 권장).",
+      replaceable:false },
+
+    { id:"R043", canonical:"Oleic Acid",
+      aliases:["oleic acid","(z)-octadec-9-enoic acid","oleic acid (olive)","oleic acid (sunflower)","olein","red oil","올레인산","올레익산","asam oleat","asam olein"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Animal or vegetable-derived. Vegetable origin preferred.",
+      reason_kr:"동물 또는 식물성 유래. 식물성 권장.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration. Vegetable-derived with halal cert preferred.",
+      guide_kr:"필요: 유래 선언서. 할랄 인증 식물성 권장.",
+      replaceable:false },
+
+    { id:"R044", canonical:"Glyceryl Stearate",
+      aliases:["glyceryl stearate","glyceryl monostearate","gms","glycerol monostearate","glycerin monostearate","glyceryl stearate se","glyceryl distearate","글리세릴 스테아레이트","글리세롤 모노스테아레이트","GMS","gliseril stearat"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Ester of glycerin + stearic acid — both may be animal. Dual origin confirmation needed.",
+      reason_kr:"글리세린 + 스테아린산 에스테르 — 둘 다 동물 유래 가능. 이중 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration for both glycerin AND stearic acid components. Halal cert.",
+      guide_kr:"필요: 글리세린 및 스테아린산 양쪽 유래 선언서. 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R045", canonical:"Cetearyl Alcohol",
+      aliases:["cetearyl alcohol","cetostearyl alcohol","cetyl stearyl alcohol","emulsifying wax","emulsifying wax nf","세테아릴알코올","세토스테아릴알코올","세틸스테아릴알코올","alkohol cetearil","cetearil alkohol"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Fatty alcohol — typically plant (palm/coconut) but may be animal. Confirmation needed.",
+      reason_kr:"지방 알코올 — 통상 식물성이나 동물 유래 가능. 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration confirming plant (palm/coconut) source.",
+      guide_kr:"필요: 식물성(팜/코코넛) 유래 확인 선언서.",
+      replaceable:false },
+
+    { id:"R046", canonical:"Polysorbate 20",
+      aliases:["polysorbate 20","tween 20","e432","polyoxyethylene sorbitan monolaurate","polyoxyethylene (20) sorbitan monolaurate","폴리소르베이트 20","트윈 20","폴리옥시에틸렌 소르비탄 모노라우레이트","polisorbat 20"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Sorbitol + lauric acid derivative. Raw material origin verification required.",
+      reason_kr:"소르비톨 + 라우린산 유도체. 원료 유래 검증 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari bahan haram harus diverifikasi.",
+      guide_en:"Required: (1) Raw material origin declaration, (2) Process documentation, (3) Halal cert.",
+      guide_kr:"필요: (1) 원료 유래 선언서, (2) 공정 문서, (3) 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R047", canonical:"Polysorbate 60",
+      aliases:["polysorbate 60","tween 60","e435","polyoxyethylene sorbitan monostearate","polyoxyethylene (60) sorbitan monostearate","폴리소르베이트 60","트윈 60","폴리옥시에틸렌 소르비탄 모노스테아레이트","polisorbat 60"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Sorbitol + stearic acid. Stearic acid origin must be confirmed.",
+      reason_kr:"소르비톨 + 스테아린산. 스테아린산 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari bahan haram harus diverifikasi.",
+      guide_en:"Required: Stearic acid origin declaration + halal cert for finished polysorbate.",
+      guide_kr:"필요: 스테아린산 유래 선언서 + 완제품 폴리소르베이트 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R048", canonical:"Polysorbate 80",
+      aliases:["polysorbate 80","tween 80","e433","polyoxyethylene sorbitan monooleate","polyoxyethylene (80) sorbitan monooleate","폴리소르베이트 80","트윈 80","폴리옥시에틸렌 소르비탄 모노올레에이트","polisorbat 80"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Sorbitol + oleic acid. Oleic acid origin must be confirmed.",
+      reason_kr:"소르비톨 + 올레인산. 올레인산 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari bahan haram harus diverifikasi.",
+      guide_en:"Required: Oleic acid origin declaration + halal cert.",
+      guide_kr:"필요: 올레인산 유래 선언서 + 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R049", canonical:"Stearyl Alcohol",
+      aliases:["stearyl alcohol","1-octadecanol","n-octadecanol","octadecyl alcohol","스테아릴알코올","옥타데실알코올","alkohol stearil","stearil alkohol"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Fatty alcohol — animal or plant-derived. Origin confirmation required.",
+      reason_kr:"지방 알코올 — 동물 또는 식물성 유래. 원료 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Origin declaration (plant/synthetic preferred). Halal cert.",
+      guide_kr:"필요: 유래 선언서(식물성/합성 권장). 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R050", canonical:"Lecithin",
+      aliases:["lecithin","soy lecithin","sunflower lecithin","egg lecithin","phosphatidylcholine","e322","lecithin (soy)","lecithin (sunflower)","lecithin (egg)","de-oiled lecithin","hydrogenated lecithin","lysolecithin","레시틴","대두 레시틴","해바라기 레시틴","난황 레시틴","레시틴 (대두)","lesitin","lesitin kedelai","lesitin bunga matahari"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"May be soy, sunflower, or egg-derived. Egg lecithin requires additional confirmation.",
+      reason_kr:"대두, 해바라기, 달걀 유래 가능. 달걀 레시틴 추가 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Source declaration (soy/sunflower preferred). If egg: halal cert.",
+      guide_kr:"필요: 유래 선언서(대두/해바라기 권장). 달걀 유래: 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R051", canonical:"Sorbitan Stearate",
+      aliases:["sorbitan stearate","e491","span 60","sorbitan monostearate","소르비탄 스테아레이트","소르비탄 모노스테아레이트","스팬 60","sorbitan stearat"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Sorbitol + stearic acid. Stearic acid origin must be confirmed.",
+      reason_kr:"소르비톨 + 스테아린산. 스테아린산 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari bahan haram harus diverifikasi.",
+      guide_en:"Required: Stearic acid origin declaration + halal cert.",
+      guide_kr:"필요: 스테아린산 유래 선언서 + 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R052", canonical:"Sodium Stearoyl Lactylate",
+      aliases:["sodium stearoyl lactylate","ssl","e481","sodium stearoyl-2-lactylate","calcium stearoyl lactylate","e482","소듐 스테아로일 락틸레이트","나트륨 스테아로일 락틸레이트","natrium stearoil laktilat"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Stearic acid + lactic acid. Both origin confirmations required.",
+      reason_kr:"스테아린산 + 젖산. 양쪽 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari bahan haram harus diverifikasi.",
+      guide_en:"Required: Stearic acid + lactic acid fermentation medium confirmation. Halal cert.",
+      guide_kr:"필요: 스테아린산 유래 + 젖산 발효 배지 확인. 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R053", canonical:"Magnesium Stearate",
+      aliases:["magnesium stearate","magnesium distearate","e572","magnesium stearate (vegetable)","magnesium stearate (animal)","마그네슘 스테아레이트","마그네슘 스테아르산염","magnesium stearat"],
+      status:"HOLD", category:"Emulsifier",
+      reason_en:"Stearic acid may be animal or vegetable. Origin confirmation needed.",
+      reason_kr:"스테아린산이 동물 또는 식물성 유래 가능. 원료 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Stearic acid origin declaration. Plant-derived preferred.",
+      guide_kr:"필요: 스테아린산 유래 선언서. 식물성 권장.",
+      replaceable:false },
+
+    // ── HOLD: 보존제 ──
+    { id:"R054", canonical:"Phenoxyethanol",
+      aliases:["phenoxyethanol","2-phenoxyethanol","phenoxetol","euxyl pe 9010","rose ether","phenoxyethanol (and) ethylhexylglycerin","페녹시에탄올","2-페녹시에탄올","페녹시에탄올 페녹세톨","fenoksietanol"],
+      status:"HOLD", category:"Preservative",
+      reason_en:"Synthetic preservative. Confirm synthetic origin and no ethanol contamination.",
+      reason_kr:"합성 보존제. 합성 유래 및 에탄올 오염 없음 확인.",
+      rule_ref:"HAS 23000:2020",
+      article_text:"HAS 23000:2020: Bahan sintetis harus diverifikasi sumbernya.",
+      guide_en:"Required: Supplier declaration confirming synthetic origin.",
+      guide_kr:"필요: 합성 유래 공급사 선언서.",
+      replaceable:false },
+
+    { id:"R055", canonical:"Ethylhexylglycerin",
+      aliases:["ethylhexylglycerin","2-ethylhexyl glycerin","octyl glycerin","sensiva sc 50","3-[(2-ethylhexyl)oxy]-1,2-propanediol","에틸헥실글리세린","옥틸글리세린","etilheksilgliserin"],
+      status:"HOLD", category:"Preservative",
+      reason_en:"Glycerin-derived — same origin concerns apply.",
+      reason_kr:"글리세린 유래 — 동일한 유래 우려 적용.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang bersumber dari hewan harus dapat dibuktikan kehalalannya.",
+      guide_en:"Required: Glycerin source declaration (plant/synthetic preferred). Halal cert.",
+      guide_kr:"필요: 글리세린 원료 유래 선언서(식물성/합성 권장). 할랄 인증서.",
+      replaceable:false },
+
+    { id:"R056", canonical:"Caprylyl Glycol",
+      aliases:["caprylyl glycol","1,2-octanediol","octane-1,2-diol","2-octanol diol","카프릴릴글리콜","옥탄디올","1,2-옥탄디올","kaprilil glikol"],
+      status:"HOLD", category:"Preservative",
+      reason_en:"Synthetic or coconut-derived glycol. Origin confirmation needed.",
+      reason_kr:"합성 또는 코코넛 유래 글리콜. 유래 확인 필요.",
+      rule_ref:"HAS 23000:2020 Section 4.2",
+      article_text:"HAS 23000:2020: Bahan yang berpotensi dari sumber haram harus diverifikasi.",
+      guide_en:"Required: Origin declaration (synthetic or coconut-derived).",
+      guide_kr:"필요: 유래 선언서(합성 또는 코코넛 유래).",
+      replaceable:false }
+  ]
+};
+
+// ============================================================
+// STATE
+// ============================================================
+let currentStep = 0;
+let currentRole = 'manufacturer';
+let analysisResults = [];
+let overallStatus = 'PASS';
+let uploadedFiles = {};
+
+// ============================================================
+// ROLE
+// ============================================================
+function setRole(role) {
+  currentRole = role;
+  document.body.className = role;
+  document.querySelectorAll('.role-btn').forEach((b, i) => {
+    b.classList.toggle('active', (i===0&&role==='manufacturer')||(i===1&&role==='consultant'));
+  });
+  const guidePanel = document.getElementById('consultantGuidePanel');
+  if (guidePanel) guidePanel.style.display = (role === 'consultant' && analysisResults.length > 0) ? 'block' : 'none';
+  if (analysisResults.length > 0) { renderIngredientResults(); renderConsultantGuide(); }
+  if (currentStep === 7) generateFinalReport();
+}
+
+// ============================================================
+// NAVIGATION
+// ============================================================
+function tryGoStep(n) { if (n <= currentStep) showPage(n); }
+
+function showPage(n) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page'+n).classList.add('active');
+  updateProgress(n);
+  currentStep = n;
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+
+function updateProgress(active) {
+  for (let i=0;i<=7;i++) {
+    const d = document.getElementById('dot'+i);
+    d.classList.remove('active','done','stop');
+    if (i < active) d.classList.add('done');
+    else if (i === active) d.classList.add('active');
+    if (i < 7) { const l = document.getElementById('line'+i+(i+1)); if(l) l.classList.toggle('done', i<active); }
+  }
+}
+
+function nextStep(current) {
+  if (current === 2 && analysisResults.length === 0) { alert('Please run the ingredient analysis first.\n먼저 성분 분석을 실행해 주세요.'); return; }
+  if (current < 7) { showPage(current+1); if (current+1===7) generateFinalReport(); }
+}
+function prevStep(current) { if (current > 0) showPage(current-1); }
+
+function jumpToFinalReport() { showPage(7); generateFinalReport(); }
+
+// ============================================================
+// FILE UPLOAD
+// ============================================================
+function triggerUpload(id) { document.getElementById(id).click(); }
+
+function markUploaded(fileId, iconId, statusId) {
+  const file = document.getElementById(fileId);
+  if (file && file.files.length > 0) {
+    uploadedFiles[fileId] = file.files[0].name;
+    const icon = document.getElementById(iconId);
+    if (icon) { icon.className = 'check-icon check-yes'; icon.textContent = '✓'; }
+    const status = document.getElementById(statusId);
+    if (status) { status.className = 'upload-status uploaded'; status.textContent = '✓ ' + file.files[0].name.substring(0,20) + (file.files[0].name.length>20?'...':''); }
+  }
+}
+
+// ============================================================
+// RULE ENGINE — 4-Layer System (v0.5)
+// ============================================================
+// Layer 1:   명시적 Rule DB (STOP/HOLD 66개 — 정확한 매칭)
+// Layer 1.5: Decomposition Map (성분 계보 분해 — 유도체 상속)
+// Layer 2:   접미사/접두사 패턴 (성분 계열 자동 분류)
+// Layer 3:   위험 키워드 (단어 포함 여부로 HOLD 처리)
+// Default:   기본값 PASS
+// ============================================================
+
+function normalizeIng(name) {
+  return name.toLowerCase().trim().replace(/[()[\]]/g,'').trim();
+}
+
+// ── Layer 2: 접미사/접두사 패턴 ──────────────────────────────
+// EN(INCI) + KR(한국어) + ID(인도네시아어) 패턴 통합
+const SUFFIX_PREFIX_RULES = [
+  // 지방산 에스테르 계열
+  { pattern: /\b\w*(stearate|palmitate|myristate|laurate|oleate|linoleate|behenate|arachidonate|스테아레이트|팔미테이트|미리스테이트|라우레이트|올레에이트|stearat|palmitat|miristat|laurat|oleat)\b/i,
+    reason_en: "Fatty acid ester — may be animal or vegetable-derived. Origin confirmation required.",
+    reason_kr: "지방산 에스테르 계열. 동물 또는 식물성 유래 가능. 원료 유래 확인 필요.",
+    guide_en: "Required: Origin declaration for fatty acid component. Plant-derived or halal-certified animal source.",
+    guide_kr: "필요: 지방산 성분 유래 선언서. 식물성 또는 할랄 인증 동물 유래.",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // 지방 알코올 계열
+  { pattern: /\b\w*(cetyl|stearyl|behenyl|arachidyl|myristyl|lauryl|oleyl|cetearyl|세틸|스테아릴|베헤닐|세테아릴)\s*(alcohol|알코올|alkohol)?\b/i,
+    reason_en: "Fatty alcohol — may be animal or plant-derived. Origin confirmation required.",
+    reason_kr: "지방 알코올 계열. 동물 또는 식물성 유래 가능. 원료 유래 확인 필요.",
+    guide_en: "Required: Origin declaration confirming plant (palm/coconut) source.",
+    guide_kr: "필요: 식물성(팜/코코넛) 유래 확인 선언서.",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // 가수분해 단백질 계열 — EN + KR + ID
+  { pattern: /(hydrolyzed|가수분해|terhidrolisis|dihidrolisis)\s+\w+\s*(protein|collagen|keratin|elastin|silk|wheat|soy|corn|milk|casein|단백질|콜라겐|케라틴|엘라스틴|실크|밀|대두|우유|카세인|protein|kolagen|keratin|sutra|gandum|kedelai|kasein)/i,
+    reason_en: "Hydrolyzed protein — origin must be confirmed. Animal-derived requires halal slaughter cert.",
+    reason_kr: "가수분해 단백질 계열. 원료 유래 확인 필요. 동물 유래 시 할랄 도축 인증서 필요.",
+    guide_en: "Required: Species/source declaration. If animal-derived: halal slaughter certificate.",
+    guide_kr: "필요: 종/원산지 선언서. 동물 유래 시: 할랄 도축 인증서.",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // 발효 유래 계열 — EN + KR + ID
+  { pattern: /\b(ferment|발효|fermentasi|hasil fermentasi)\w*/i,
+    reason_en: "Fermentation-derived ingredient. Fermentation medium must be halal-certified.",
+    reason_kr: "발효 유래 성분. 발효 배지 할랄 인증 필요.",
+    guide_en: "Required: (1) Halal fermentation medium declaration, (2) No animal-derived nutrients.",
+    guide_kr: "필요: (1) 할랄 발효 배지 선언서, (2) 동물 유래 영양분 없음 확인.",
+    ref: "HAS 23000:2020" },
+
+  // 글리세릴 에스테르 계열 — EN + KR + ID
+  { pattern: /(glyceryl|글리세릴|gliseril)\s+\w+(ate|ol|yl|에이트|올)/i,
+    reason_en: "Glyceryl ester — glycerin component may be animal-derived. Dual origin confirmation needed.",
+    reason_kr: "글리세릴 에스테르. 글리세린 성분 동물 유래 가능. 이중 원료 유래 확인 필요.",
+    guide_en: "Required: Origin declaration for glycerin component (plant/synthetic preferred).",
+    guide_kr: "필요: 글리세린 성분 유래 선언서 (식물성/합성 권장).",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // 소르비탄 에스테르 계열
+  { pattern: /(sorbitan|소르비탄|sorbitan)\s+\w+/i,
+    reason_en: "Sorbitan ester — fatty acid component origin must be confirmed.",
+    reason_kr: "소르비탄 에스테르. 지방산 성분 유래 확인 필요.",
+    guide_en: "Required: Fatty acid origin declaration + halal cert.",
+    guide_kr: "필요: 지방산 유래 선언서 + 할랄 인증서.",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // PEG 계열 — EN + KR
+  { pattern: /\b(peg|피이지)-?\d+\b/i,
+    reason_en: "PEG compound — polyethylene glycol derivative. Manufacturing process halal verification required.",
+    reason_kr: "PEG 화합물. 폴리에틸렌글리콜 유도체. 제조 공정 할랄 검증 필요.",
+    guide_en: "Required: Manufacturing process documentation + halal cert.",
+    guide_kr: "필요: 제조 공정 문서 + 할랄 인증서.",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // 폴리글리세릴 계열
+  { pattern: /(polyglyceryl|폴리글리세릴|poligliseril)-?\d+/i,
+    reason_en: "Polyglyceryl compound — glycerin-derived. Origin confirmation required.",
+    reason_kr: "폴리글리세릴 화합물. 글리세린 유래. 원료 유래 확인 필요.",
+    guide_en: "Required: Glycerin origin declaration (plant-derived preferred).",
+    guide_kr: "필요: 글리세린 유래 선언서 (식물성 권장).",
+    ref: "HAS 23000:2020 Section 4.2" },
+
+  // 유산균/효모 발효 계열
+  { pattern: /\b(lactobacillus|bifidobacterium|saccharomyces|aspergillus|bacillus|유산균|락토바실러스|비피도박테리움|효모균)\b/i,
+    reason_en: "Microbial/probiotic fermentation ingredient. Fermentation medium must be halal-certified.",
+    reason_kr: "미생물/프로바이오틱 발효 성분. 발효 배지 할랄 인증 필요.",
+    guide_en: "Required: Fermentation medium declaration (no animal-derived culture medium).",
+    guide_kr: "필요: 발효 배지 선언서 (동물 유래 배양 배지 없음).",
+    ref: "HAS 23000:2020" },
+
+  // 왁스 계열 — 식물성(카르나우바 등) 제외
+  { pattern: /\b\w*(wax|왁스|lilin|malam)\b(?!.*(carnauba|candelilla|rice bran|카르나우바|칸델릴라|쌀겨|ouricury|japan|bayberry))/i,
+    reason_en: "Wax — origin must be confirmed. Animal-derived wax (beeswax) is prohibited.",
+    reason_kr: "왁스 계열. 원료 유래 확인 필요. 동물 유래 왁스(밀랍)는 금지.",
+    guide_en: "Required: Origin declaration (carnauba, candelilla, rice bran wax preferred).",
+    guide_kr: "필요: 식물성 유래 확인 선언서 (카르나우바, 칸델릴라, 쌀겨 권장).",
+    ref: "BPJPH Keputusan No.57/2021; MUI Fatwa No.33/2011" },
+
+  // 탤로우/수지 계열 — EN + KR + ID
+  { pattern: /\b(tallow|suet|lard|grease|adeps|sebum|라드|수지|동물성 지방|lemak babi|lemak hewani|gajih)\b/i,
+    reason_en: "Animal fat/tallow — porcine = STOP, other animal requires halal cert.",
+    reason_kr: "동물성 지방/수지. 돼지 유래 = STOP, 기타 동물 = 할랄 인증 필요.",
+    guide_en: "Required: Species confirmation (NOT porcine) + halal slaughter certificate.",
+    guide_kr: "필요: 종 확인 (돼지 금지) + 할랄 도축 인증서.",
+    ref: "UU No.33/2014 Pasal 18(1); HAS 23000:2020 Section 4.2" },
+];
+
+// ── Layer 3: 위험 키워드 ──────────────────────────────────────
+// EN(영어 INCI) + KR(한국어) + ID(인도네시아어) 통합
+const RISK_KEYWORDS = [
+  // ── 동물 유래 직접 지시어 ──
+  { words: ["gelatin","gelatine","젤라틴","gelatin","gelatin sapi","gelatin ikan","gelatin babi"],
+    reason_en:"Contains 'gelatin' — animal-derived. Origin confirmation required (porcine = STOP).",
+    reason_kr:"'젤라틴' 포함 — 동물 유래. 원료 유래 확인 필요 (돼지 유래 = STOP).",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["collagen","콜라겐","kolagen","kolagen sapi","kolagen ikan"],
+    reason_en:"Contains 'collagen' — animal-derived. Species and slaughter method confirmation required.",
+    reason_kr:"'콜라겐' 포함 — 동물 유래. 종 및 도축 방법 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["placenta","태반","plasenta","ekstra plasenta"],
+    reason_en:"Contains 'placenta' — animal-derived. Full origin and processing documentation required.",
+    reason_kr:"'태반' 포함 — 동물 유래. 원산지 및 가공 방법 전체 서류 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["keratin","케라틴","keratin","protein keratin"],
+    reason_en:"Contains 'keratin' — animal-derived (hair/wool/feather). Origin confirmation required.",
+    reason_kr:"'케라틴' 포함 — 동물 유래(털/양모/깃털). 원산지 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["elastin","엘라스틴","elastin"],
+    reason_en:"Contains 'elastin' — animal connective tissue protein. Origin confirmation required.",
+    reason_kr:"'엘라스틴' 포함 — 동물 결합조직 단백질. 원산지 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["lanolin","라놀린","lanolin","wax bulu domba"],
+    reason_en:"Contains 'lanolin' — sheep wool grease. Sourcing method confirmation required.",
+    reason_kr:"'라놀린' 포함 — 양 양모 유지. 수급 방법 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["squalene","squalane","스쿠알렌","스쿠알란","skualen","skualan"],
+    reason_en:"Contains 'squalene/squalane' — traditionally shark-derived. Plant origin preferred.",
+    reason_kr:"'스쿠알렌/스쿠알란' 포함 — 전통적으로 상어 유래. 식물성 권장.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["silk","sericin","fibroin","실크","비단","sutra","serisin"],
+    reason_en:"Contains 'silk' — silkworm derived. BPJPH halal verification required.",
+    reason_kr:"'실크' 포함 — 누에 유래. BPJPH 할랄 확인 필요.",
+    ref:"MUI Fatwa No.33/2011" },
+
+  { words: ["snail","escargot","달팽이","siput","ekstra siput"],
+    reason_en:"Contains 'snail' — halal status debated. BPJPH official ruling required.",
+    reason_kr:"'달팽이' 포함 — 할랄 여부 논쟁. BPJPH 공식 판결 확인 필요.",
+    ref:"MUI Fatwa No.33/2011" },
+
+  { words: ["carnitine","카르니틴","karnitin"],
+    reason_en:"Contains 'carnitine' — may be animal-derived. Origin confirmation required.",
+    reason_kr:"'카르니틴' 포함 — 동물 유래 가능. 원산지 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["chondroitin","콘드로이틴","kondroitin"],
+    reason_en:"Contains 'chondroitin' — cartilage-derived. Species confirmation critical (porcine = STOP).",
+    reason_kr:"'콘드로이틴' 포함 — 연골 유래. 종 확인 중요 (돼지 = STOP).",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["glucosamine","글루코사민","glukosamin"],
+    reason_en:"Contains 'glucosamine' — typically shellfish-derived. Origin confirmation required.",
+    reason_kr:"'글루코사민' 포함 — 통상 갑각류 유래. 원산지 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  // ── 곤충/벌 유래 ──
+  { words: ["honey","꿀","벌꿀","madu","ekstra madu"],
+    reason_en:"Contains 'honey' — bee-derived. Prohibited under BPJPH.",
+    reason_kr:"'꿀' 포함 — 꿀벌 유래. BPJPH 기준 금지.",
+    ref:"BPJPH Keputusan No.57/2021" },
+
+  { words: ["propolis","프로폴리스","propolis"],
+    reason_en:"Contains 'propolis' — bee-derived. Prohibited under BPJPH.",
+    reason_kr:"'프로폴리스' 포함 — 꿀벌 유래. BPJPH 기준 금지.",
+    ref:"BPJPH Keputusan No.57/2021" },
+
+  { words: ["royal jelly","로열젤리","royal jelly","jeli kerajaan"],
+    reason_en:"Contains 'royal jelly' — bee-derived. Prohibited under BPJPH.",
+    reason_kr:"'로열젤리' 포함 — 꿀벌 유래. BPJPH 기준 금지.",
+    ref:"BPJPH Keputusan No.57/2021" },
+
+  { words: ["밀랍","beeswax","bee wax","lilin lebah"],
+    reason_en:"Beeswax — bee-derived. Prohibited under BPJPH.",
+    reason_kr:"밀랍/비즈왁스 — 꿀벌 유래. BPJPH 기준 금지.",
+    ref:"BPJPH Keputusan No.57/2021" },
+
+  // ── 발효 유래 ──
+  { words: ["ferment","fermentation","발효","fermentasi","hasil fermentasi"],
+    reason_en:"Fermentation-derived. Halal fermentation medium confirmation required.",
+    reason_kr:"발효 유래. 할랄 발효 배지 확인 필요.",
+    ref:"HAS 23000:2020" },
+
+  { words: ["lysate","용해물","lisat"],
+    reason_en:"Microbial lysate — fermentation origin. Medium confirmation required.",
+    reason_kr:"미생물 용해물 — 발효 유래. 배지 확인 필요.",
+    ref:"HAS 23000:2020" },
+
+  { words: ["yeast extract","yeast filtrate","효모 추출물","효모 여과물","ekstrak ragi","filtrat ragi"],
+    reason_en:"Yeast-derived. Fermentation medium confirmation required.",
+    reason_kr:"효모 유래. 발효 배지 확인 필요.",
+    ref:"HAS 23000:2020" },
+
+  // ── 알코올 계열 ──
+  { words: ["alcohol denat","denatured alcohol","sd alcohol","변성 알코올","alkohol terdenaturasi"],
+    reason_en:"Denatured alcohol — origin declaration required.",
+    reason_kr:"변성 알코올 — 원료 유래 선언서 필요.",
+    ref:"MUI Fatwa No.11/2009" },
+
+  // ── 글리세린 관련 ──
+  { words: ["glycereth","글리세레스","gliseret"],
+    reason_en:"Polyethoxylated glycerin derivative. Origin confirmation required.",
+    reason_kr:"폴리에톡시화 글리세린 유도체. 원료 유래 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  // ── 동물성 지방 ──
+  { words: ["tallow","suet","라드","수지","lemak babi","lemak sapi","lemak hewani","gajih","lemak kambing"],
+    reason_en:"Animal fat/tallow — origin critical (porcine = STOP).",
+    reason_kr:"동물성 지방/수지 — 원산지 중요 (돼지 = STOP).",
+    ref:"UU No.33/2014 Pasal 18(1)" },
+
+  // ── 단백질/펩타이드 ──
+  { words: ["peptide","펩타이드","peptida"],
+    reason_en:"Peptide — if animal-derived, halal slaughter cert required.",
+    reason_kr:"펩타이드 — 동물 유래 시 할랄 도축 인증 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  // ── 달걀/유제품 유래 ──
+  { words: ["egg","ovum","달걀","계란","telur","ekstra telur"],
+    reason_en:"Egg-derived ingredient. Halal processing confirmation required.",
+    reason_kr:"달걀 유래 성분. 할랄 가공 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["whey","casein","lactis","유청","카세인","유단백","whey","kasein","susu"],
+    reason_en:"Dairy-derived. Confirm no porcine enzymes used in processing.",
+    reason_kr:"유제품 유래. 가공 시 돼지 유래 효소 미사용 확인.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  // ── 혈액/체액 유래 ──
+  { words: ["blood","serum","plasma","혈액","혈청","darah","serum darah","plasma darah"],
+    reason_en:"Blood/serum-derived. Prohibited unless from halal-slaughtered animal with full documentation.",
+    reason_kr:"혈액/혈청 유래. 할랄 도축 동물 + 전체 서류 없으면 금지.",
+    ref:"UU No.33/2014; HAS 23000:2020" },
+
+  { words: ["urine","amniotic","소변","양수","urin","cairan amnion"],
+    reason_en:"Biological fluid-derived. Prohibited.",
+    reason_kr:"생물학적 유체 유래. 금지.",
+    ref:"UU No.33/2014 Pasal 17" },
+
+  // ── 인도네시아어 전용 — 돼지 유래 직접 지시어 ──
+  { words: ["babi","lemak babi","gelatin babi","kolagen babi","kulit babi","tulang babi","darah babi"],
+    reason_en:"Contains porcine-related term (Indonesian) — STOP: porcine-derived ingredients are strictly prohibited.",
+    reason_kr:"인도네시아어 돼지 유래 용어 포함 — STOP: 돼지 유래 성분 엄격히 금지.",
+    ref:"UU No.33/2014 Pasal 18(1)" },
+
+  // ── 인도네시아어 — 동물 유래 일반 ──
+  { words: ["hewani","asal hewan","turunan hewan","lemak hewani","protein hewani"],
+    reason_en:"Animal-derived ingredient (Indonesian term). Species and halal slaughter confirmation required.",
+    reason_kr:"인도네시아어 동물 유래 성분. 종 및 할랄 도축 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  // ── 한국어 전용 위험 표현 ──
+  { words: ["돼지","돈","포크","부산물"],
+    reason_en:"Porcine-related Korean term detected — STOP: porcine-derived ingredients are strictly prohibited.",
+    reason_kr:"돼지 유래 관련 한국어 표현 감지 — STOP: 돼지 유래 성분 엄격히 금지.",
+    ref:"UU No.33/2014 Pasal 18(1)" },
+
+  { words: ["동물성","동물 유래","축산 부산물","우유","우지","우골"],
+    reason_en:"Animal-derived Korean term. Origin and halal slaughter confirmation required.",
+    reason_kr:"동물 유래 한국어 표현. 원산지 및 할랄 도축 확인 필요.",
+    ref:"HAS 23000:2020 Section 4.2" },
+
+  { words: ["발효","균주","효모","유산균","배양"],
+    reason_en:"Fermentation-related Korean term. Halal fermentation medium confirmation required.",
+    reason_kr:"발효 관련 한국어 표현. 할랄 발효 배지 확인 필요.",
+    ref:"HAS 23000:2020" },
+];
+
+// ============================================================
+// LAYER 1.5 — DECOMPOSITION MAP (성분 계보 분해)
+// 유도체 성분을 구성 원료로 분해해 각 원료의 규칙을 상속
+// 판정 우선순위: STOP > HOLD > PASS
+// ============================================================
+const DECOMPOSITION_MAP = {
+  // ── 글리세린 에스테르 계열 ──────────────────────────────────
+  "glyceryl stearate":          { components:["glycerin","stearic acid"], reaction:"esterification" },
+  "glyceryl monostearate":      { components:["glycerin","stearic acid"], reaction:"esterification" },
+  "glyceryl distearate":        { components:["glycerin","stearic acid"], reaction:"esterification" },
+  "glyceryl palmitate":         { components:["glycerin","palmitic acid"], reaction:"esterification" },
+  "glyceryl oleate":            { components:["glycerin","oleic acid"], reaction:"esterification" },
+  "glyceryl laurate":           { components:["glycerin","lauric acid"], reaction:"esterification" },
+  "glyceryl myristate":         { components:["glycerin","myristic acid"], reaction:"esterification" },
+  "glyceryl behenate":          { components:["glycerin","behenic acid"], reaction:"esterification" },
+  "glyceryl caprylate":         { components:["glycerin","caprylic acid"], reaction:"esterification" },
+  "glyceryl caprate":           { components:["glycerin","capric acid"], reaction:"esterification" },
+  "glyceryl linoleate":         { components:["glycerin","linoleic acid"], reaction:"esterification" },
+  "glyceryl ricinoleate":       { components:["glycerin","ricinoleic acid"], reaction:"esterification" },
+  "glyceryl isostearate":       { components:["glycerin","isostearic acid"], reaction:"esterification" },
+  "diglycerin":                 { components:["glycerin"], reaction:"polymerization" },
+  "polyglycerin":               { components:["glycerin"], reaction:"polymerization" },
+
+  // ── 소르비탄 에스테르 계열 ──────────────────────────────────
+  "sorbitan stearate":          { components:["sorbitol","stearic acid"], reaction:"esterification" },
+  "sorbitan palmitate":         { components:["sorbitol","palmitic acid"], reaction:"esterification" },
+  "sorbitan oleate":            { components:["sorbitol","oleic acid"], reaction:"esterification" },
+  "sorbitan laurate":           { components:["sorbitol","lauric acid"], reaction:"esterification" },
+  "sorbitan sesquioleate":      { components:["sorbitol","oleic acid"], reaction:"esterification" },
+  "sorbitan isostearate":       { components:["sorbitol","isostearic acid"], reaction:"esterification" },
+  "sorbitan trioleate":         { components:["sorbitol","oleic acid"], reaction:"esterification" },
+  "sorbitan tristearate":       { components:["sorbitol","stearic acid"], reaction:"esterification" },
+
+  // ── 폴리소르베이트 계열 (PEG + 소르비탄 에스테르) ──────────
+  "polysorbate 20":             { components:["sorbitol","lauric acid","ethylene oxide"], reaction:"ethoxylation" },
+  "polysorbate 40":             { components:["sorbitol","palmitic acid","ethylene oxide"], reaction:"ethoxylation" },
+  "polysorbate 60":             { components:["sorbitol","stearic acid","ethylene oxide"], reaction:"ethoxylation" },
+  "polysorbate 65":             { components:["sorbitol","stearic acid","ethylene oxide"], reaction:"ethoxylation" },
+  "polysorbate 80":             { components:["sorbitol","oleic acid","ethylene oxide"], reaction:"ethoxylation" },
+  "polysorbate 85":             { components:["sorbitol","oleic acid","ethylene oxide"], reaction:"ethoxylation" },
+
+  // ── PEG 지방산 에스테르 계열 ────────────────────────────────
+  "peg-100 stearate":           { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-40 stearate":            { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-8 stearate":             { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-20 stearate":            { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-150 stearate":           { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-2 stearate":             { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-8 oleate":               { components:["oleic acid","ethylene glycol"], reaction:"esterification" },
+  "peg-40 hydrogenated castor oil": { components:["castor oil","ethylene oxide"], reaction:"ethoxylation" },
+  "peg-60 hydrogenated castor oil": { components:["castor oil","ethylene oxide"], reaction:"ethoxylation" },
+
+  // ── 나트륨 지방산 계열 ──────────────────────────────────────
+  "sodium stearate":            { components:["stearic acid"], reaction:"neutralization" },
+  "sodium palmitate":           { components:["palmitic acid"], reaction:"neutralization" },
+  "sodium laurate":             { components:["lauric acid"], reaction:"neutralization" },
+  "sodium myristate":           { components:["myristic acid"], reaction:"neutralization" },
+  "sodium oleate":              { components:["oleic acid"], reaction:"neutralization" },
+  "sodium stearoyl lactylate":  { components:["stearic acid","lactic acid"], reaction:"esterification" },
+  "calcium stearoyl lactylate": { components:["stearic acid","lactic acid"], reaction:"esterification" },
+  "sodium stearoyl glutamate":  { components:["stearic acid","glutamic acid"], reaction:"esterification" },
+  "sodium lauroyl glutamate":   { components:["lauric acid","glutamic acid"], reaction:"esterification" },
+  "sodium palmitoyl glutamate": { components:["palmitic acid","glutamic acid"], reaction:"esterification" },
+  "sodium cocoyl glutamate":    { components:["coconut fatty acid","glutamic acid"], reaction:"esterification" },
+  "sodium lauroyl sarcosinate": { components:["lauric acid","sarcosine"], reaction:"esterification" },
+  "sodium stearoyl sarcosinate":{ components:["stearic acid","sarcosine"], reaction:"esterification" },
+
+  // ── 마그네슘/칼슘 지방산 계열 ───────────────────────────────
+  "magnesium stearate":         { components:["stearic acid"], reaction:"neutralization" },
+  "calcium stearate":           { components:["stearic acid"], reaction:"neutralization" },
+  "zinc stearate":              { components:["stearic acid"], reaction:"neutralization" },
+
+  // ── 알킬 글리코사이드 계열 ──────────────────────────────────
+  "decyl glucoside":            { components:["glucose","decanol"], reaction:"glycosidation" },
+  "lauryl glucoside":           { components:["glucose","lauryl alcohol"], reaction:"glycosidation" },
+  "coco-glucoside":             { components:["glucose","coconut fatty alcohol"], reaction:"glycosidation" },
+  "caprylyl/capryl glucoside":  { components:["glucose","caprylic alcohol"], reaction:"glycosidation" },
+
+  // ── 알킬 에스테르 계열 ──────────────────────────────────────
+  "isopropyl myristate":        { components:["myristic acid","isopropyl alcohol"], reaction:"esterification" },
+  "isopropyl palmitate":        { components:["palmitic acid","isopropyl alcohol"], reaction:"esterification" },
+  "isopropyl stearate":         { components:["stearic acid","isopropyl alcohol"], reaction:"esterification" },
+  "isopropyl isostearate":      { components:["isostearic acid","isopropyl alcohol"], reaction:"esterification" },
+  "ethylhexyl palmitate":       { components:["palmitic acid","ethylhexyl alcohol"], reaction:"esterification" },
+  "ethylhexyl stearate":        { components:["stearic acid","ethylhexyl alcohol"], reaction:"esterification" },
+  "ethylhexyl oleate":          { components:["oleic acid","ethylhexyl alcohol"], reaction:"esterification" },
+  "ethylhexyl myristate":       { components:["myristic acid","ethylhexyl alcohol"], reaction:"esterification" },
+  "cetyl palmitate":            { components:["palmitic acid","cetyl alcohol"], reaction:"esterification" },
+  "cetyl stearate":             { components:["stearic acid","cetyl alcohol"], reaction:"esterification" },
+  "stearyl stearate":           { components:["stearic acid","stearyl alcohol"], reaction:"esterification" },
+  "behenyl behenate":           { components:["behenic acid","behenyl alcohol"], reaction:"esterification" },
+  "butyl stearate":             { components:["stearic acid","butyl alcohol"], reaction:"esterification" },
+  "myristyl myristate":         { components:["myristic acid","myristyl alcohol"], reaction:"esterification" },
+
+  // ── 글리세릴 에테르 / 유도체 ────────────────────────────────
+  "ethylhexylglycerin":         { components:["glycerin","ethylhexyl alcohol"], reaction:"etherification" },
+  "caprylyl glycol":            { components:["glycerin","caprylic acid"], reaction:"reduction" },
+
+  // ── 레시틴 유도체 ───────────────────────────────────────────
+  "hydrogenated lecithin":      { components:["lecithin"], reaction:"hydrogenation" },
+  "lysolecithin":               { components:["lecithin"], reaction:"hydrolysis" },
+
+  // ── 콜라겐/케라틴 유도체 ────────────────────────────────────
+  "hydrolyzed collagen":        { components:["collagen"], reaction:"hydrolysis" },
+  "hydrolysed collagen":        { components:["collagen"], reaction:"hydrolysis" },
+  "collagen peptide":           { components:["collagen"], reaction:"hydrolysis" },
+  "collagen amino acids":       { components:["collagen"], reaction:"hydrolysis" },
+  "hydrolyzed keratin":         { components:["keratin"], reaction:"hydrolysis" },
+  "hydrolysed keratin":         { components:["keratin"], reaction:"hydrolysis" },
+  "hydrolyzed silk":            { components:["hydrolyzed silk"], reaction:"hydrolysis" },
+  "hydrolyzed elastin":         { components:["elastin"], reaction:"hydrolysis" },
+  "hydrolyzed milk protein":    { components:["milk proteins / whey"], reaction:"hydrolysis" },
+  "hydrolyzed wheat protein":   { components:["wheat protein"], reaction:"hydrolysis" },
+
+  // ── 히알루론산 유도체 ───────────────────────────────────────
+  "sodium hyaluronate":                { components:["hyaluronic acid"], reaction:"neutralization" },
+  "hydrolyzed hyaluronic acid":        { components:["hyaluronic acid"], reaction:"hydrolysis" },
+  "sodium hyaluronate crosspolymer":   { components:["hyaluronic acid"], reaction:"crosslinking" },
+
+  // ── 젖산 유도체 ─────────────────────────────────────────────
+  "sodium lactate":             { components:["lactic acid"], reaction:"neutralization" },
+  "calcium lactate":            { components:["lactic acid"], reaction:"neutralization" },
+  "ammonium lactate":           { components:["lactic acid"], reaction:"neutralization" },
+  "zinc lactate":               { components:["lactic acid"], reaction:"neutralization" },
+  "potassium lactate":          { components:["lactic acid"], reaction:"neutralization" },
+
+  // ── 발효 유도체 ─────────────────────────────────────────────
+  "galactomyces ferment filtrate":  { components:["galactomyces ferment filtrate"], reaction:"fermentation" },
+  "bifida ferment lysate":          { components:["bifida ferment lysate"], reaction:"fermentation" },
+  "lactobacillus ferment":          { components:["bifida ferment lysate"], reaction:"fermentation" },
+
+  // ── 팜/코코넛 유래 지방 알코올 에스테르 ─────────────────────
+  "cetearyl olivate":           { components:["cetearyl alcohol","olive oil"], reaction:"esterification" },
+  "sucrose stearate":           { components:["stearic acid","sucrose"], reaction:"esterification" },
+  "sucrose palmitate":          { components:["palmitic acid","sucrose"], reaction:"esterification" },
+  "sucrose laurate":            { components:["lauric acid","sucrose"], reaction:"esterification" },
+};
+
+// ── 성분 계보 내 원료 Rule DB 조회 헬퍼 ─────────────────────
+function findComponentRule(componentName) {
+  const n = componentName.toLowerCase().trim();
+  for (const rule of RULE_DB.rules) {
+    for (const alias of rule.aliases) {
+      if (n === alias.toLowerCase() || n.includes(alias.toLowerCase()) || alias.toLowerCase().includes(n)) {
+        return rule;
+      }
+    }
+  }
+  return null;
+}
+
+// ── 판정 우선순위: STOP > HOLD > PASS ────────────────────────
+function mergeStatus(statuses) {
+  if (statuses.includes("STOP")) return "STOP";
+  if (statuses.includes("HOLD")) return "HOLD";
+  return "PASS";
+}
+
+// ── 4-Layer Matching Function ─────────────────────────────────
+function matchIngredient(name) {
+  const n = normalizeIng(name);
+  const nOriginal = name.toLowerCase().trim();
+
+  // ── Layer 1: 명시적 Rule DB 매칭 ──
+  for (const rule of RULE_DB.rules) {
+    for (const alias of rule.aliases) {
+      if (n === alias.toLowerCase() ||
+          n.includes(alias.toLowerCase()) ||
+          alias.toLowerCase().includes(n)) {
+        return { ...rule, matchLayer: 1 };
+      }
+    }
+  }
+
+  // ── Layer 1.5: Decomposition Map — 성분 계보 분해 ──
+  // 입력된 성분명이 Decomposition Map에 있으면
+  // 구성 원료별로 Rule DB를 조회하고 판정을 상속
+  for (const [key, decomp] of Object.entries(DECOMPOSITION_MAP)) {
+    if (nOriginal === key || nOriginal.includes(key) || key.includes(nOriginal)) {
+      const componentResults = decomp.components.map(comp => {
+        const rule = findComponentRule(comp);
+        return rule || { status: "PASS", canonical: comp };
+      });
+
+      const statuses = componentResults.map(r => r.status);
+      const inheritedStatus = mergeStatus(statuses);
+
+      if (inheritedStatus === "PASS") break; // PASS면 다음 레이어로
+
+      // STOP 또는 HOLD 상속
+      const stopComponents = componentResults.filter(r => r.status === "STOP");
+      const holdComponents = componentResults.filter(r => r.status === "HOLD");
+      const criticalComponents = stopComponents.length > 0 ? stopComponents : holdComponents;
+
+      // 구성 원료들의 reason을 합쳐서 출력
+      const compSummary_en = criticalComponents
+        .map(r => `[${r.canonical||r.status}] ${r.reason_en||''}`)
+        .join(" | ");
+      const compSummary_kr = criticalComponents
+        .map(r => `[${r.canonical||r.status}] ${r.reason_kr||''}`)
+        .join(" | ");
+      const compGuide_en = criticalComponents
+        .map(r => r.guide_en||'')
+        .filter(Boolean).join(" | ");
+      const compGuide_kr = criticalComponents
+        .map(r => r.guide_kr||'')
+        .filter(Boolean).join(" | ");
+      const compRefs = [...new Set(criticalComponents.map(r => r.rule_ref).filter(Boolean))].join("; ");
+
+      return {
+        status: inheritedStatus,
+        canonical: name,
+        matchLayer: 1.5,
+        layerLabel: "Decomposition",
+        decomposedFrom: decomp.components,
+        reason_en: `Derivative of: ${decomp.components.join(" + ")} (${decomp.reaction}). ${compSummary_en}`,
+        reason_kr: `구성 원료: ${decomp.components.join(" + ")} (${decomp.reaction}). ${compSummary_kr}`,
+        rule_ref: compRefs || "HAS 23000:2020 Section 4.2",
+        article_text: `Composed of: ${decomp.components.join(", ")}. Each component's halal status applies.`,
+        guide_en: compGuide_en || "Required: Origin declaration for all component raw materials.",
+        guide_kr: compGuide_kr || "필요: 모든 구성 원료의 유래 선언서.",
+        replaceable: false
+      };
+    }
+  }
+
+  // ── Layer 2: 접미사/접두사 패턴 매칭 ──
+  for (const r of SUFFIX_PREFIX_RULES) {
+    if (r.pattern.test(nOriginal)) {
+      return {
+        status: "HOLD",
+        canonical: name,
+        matchLayer: 2,
+        layerLabel: "Pattern Match",
+        reason_en: r.reason_en,
+        reason_kr: r.reason_kr,
+        rule_ref: r.ref,
+        article_text: "Auto-detected by suffix/prefix pattern analysis.",
+        guide_en: r.guide_en || "",
+        guide_kr: r.guide_kr || "",
+        replaceable: false
+      };
+    }
+  }
+
+  // ── Layer 3: 위험 키워드 매칭 ──
+  for (const r of RISK_KEYWORDS) {
+    for (const word of r.words) {
+      if (nOriginal.includes(word.toLowerCase())) {
+        return {
+          status: "HOLD",
+          canonical: name,
+          matchLayer: 3,
+          layerLabel: "Keyword Match",
+          reason_en: r.reason_en,
+          reason_kr: r.reason_kr,
+          rule_ref: r.ref,
+          article_text: "Auto-detected by risk keyword analysis.",
+          guide_en: "",
+          guide_kr: "",
+          replaceable: false
+        };
+      }
+    }
+  }
+
+  // ── 기본값: PASS (DB 미등록) ──
+  return {
+    status: "PASS",
+    canonical: name,
+    matchLayer: 0,
+    layerLabel: "Default PASS",
+    unclassified: true,  // DB 미등록 표시용 플래그
+    reason_en: "Not found in current rule set — treated as low-risk for preliminary review. Consultant verification recommended for unlisted ingredients.",
+    reason_kr: "현재 규칙 DB 미등록 — 사전 검토 기준 저위험 처리. 미등록 성분은 컨설턴트 확인 권장."
+  };
+}
+
+// ============================================================
+// REQUIRED DOCS MAP — 성분 카테고리별 필요 서류 자동 매핑
+// ============================================================
+const REQUIRED_DOCS_MAP = {
+  "Porcine-derived":           { docs_en:[], docs_kr:[], note_en:"Reformulation required — no documentation pathway available.", note_kr:"성분 재구성 필요 — 서류로 해결 불가." },
+  "Insect-derived":            { docs_en:[], docs_kr:[], note_en:"Reformulation required — insect-derived ingredients flagged as non-compliant. Verify with BPJPH for latest ruling.", note_kr:"성분 재구성 필요 — 최신 BPJPH 판결 확인 권장." },
+  "Animal-derived (non-halal)":{ docs_en:["Species confirmation (non-porcine)","Halal slaughter certificate","Processing method documentation"], docs_kr:["종 확인서 (비돼지)","할랄 도축 인증서","가공 방법 문서"], note_en:"", note_kr:"" },
+  "Alcohol":                   { docs_en:["Origin declaration (confirm NOT khamr-derived)","Concentration % documentation","Supplier CoA"], docs_kr:["유래 선언서 (캄르 유래 아님 확인)","함량(%) 문서","공급사 CoA"], note_en:"", note_kr:"" },
+  "Glycerin":                  { docs_en:["Supplier origin declaration (plant/synthetic preferred)","If animal-derived: halal slaughter certificate","CoA"], docs_kr:["공급사 유래 선언서 (식물성/합성 권장)","동물 유래 시: 할랄 도축 인증서","CoA"], note_en:"", note_kr:"" },
+  "Fermentation-derived":      { docs_en:["Halal fermentation medium declaration","Confirmation: no porcine-derived nutrients in culture","Supplier halal certificate"], docs_kr:["할랄 발효 배지 선언서","배양 시 돼지 유래 영양분 없음 확인","공급사 할랄 인증서"], note_en:"", note_kr:"" },
+  "Fragrance":                 { docs_en:["Full fragrance ingredient breakdown","Halal certificate for fragrance compound","Confirmation: no khamr-derived alcohol"], docs_kr:["향료 전성분 목록","향료 화합물 할랄 인증서","캄르 유래 알코올 부재 확인"], note_en:"", note_kr:"" },
+  "Animal-derived (conditional)":{ docs_en:["Species/origin declaration (NOT porcine)","Halal slaughter certificate (if bovine/ovine)","Processing documentation"], docs_kr:["종/유래 선언서 (돼지 금지)","할랄 도축 인증서 (소/양 유래 시)","가공 문서"], note_en:"", note_kr:"" },
+  "Biotechnology-derived":     { docs_en:["Cell line origin declaration (non-animal or halal-confirmed)","Fermentation medium declaration","Halal certificate"], docs_kr:["세포주 유래 선언서 (비동물 또는 할랄 확인)","발효 배지 선언서","할랄 인증서"], note_en:"", note_kr:"" },
+  "Emulsifier":                { docs_en:["Raw material origin declaration (fatty acid + glycerin/sorbitol source)","Halal certificate for finished ingredient"], docs_kr:["원료 유래 선언서 (지방산 + 글리세린/소르비톨 유래)","완제품 할랄 인증서"], note_en:"", note_kr:"" },
+  "Preservative":              { docs_en:["Supplier declaration confirming synthetic origin","Halal certificate preferred"], docs_kr:["합성 유래 확인 공급사 선언서","할랄 인증서 권장"], note_en:"", note_kr:"" },
+};
+
+function getRequiredDocs(result) {
+  if (!result.category) return null;
+  return REQUIRED_DOCS_MAP[result.category] || null;
+}
+
+function analyzeIngredients() {
+  const raw = document.getElementById('ingredientInput').value.trim();
+  if (!raw) { alert('Please enter ingredient list.\n성분 리스트를 입력해 주세요.'); return; }
+  const resultDiv = document.getElementById('analysisResult');
+  const ingDiv = document.getElementById('ingredientResults');
+  resultDiv.style.display = 'block';
+  ingDiv.innerHTML = '<div class="analyzing"><span>●</span> Analyzing ingredients / 성분 분석 중...</div>';
+  document.getElementById('stopJumpNotice').style.display = 'none';
+  document.getElementById('step2NextBtn').style.display = 'none';
+
+  setTimeout(() => {
+    const ingredients = raw.split(/[\n,]+/).map(s=>s.trim()).filter(s=>s.length>0);
+    analysisResults = [];
+    let hasStop = false, hasHold = false;
+    ingredients.forEach(ing => {
+      const match = matchIngredient(ing);
+      const r = { input: ing, canonical: match.canonical || ing, status: match.status, rule: (match.id ? match : null) };
+      analysisResults.push(r);
+      if (r.status==='STOP') hasStop = true;
+      if (r.status==='HOLD') hasHold = true;
+    });
+    overallStatus = hasStop ? 'STOP' : hasHold ? 'HOLD' : 'PASS';
+    renderSummary();
+    renderIngredientResults();
+    renderConsultantGuide();
+    populateStep3Issues();
+
+    if (hasStop) {
+      document.getElementById('stopJumpNotice').style.display = 'block';
+      document.getElementById('step2NextBtn').style.display = 'none';
+    } else {
+      document.getElementById('stopJumpNotice').style.display = 'none';
+      document.getElementById('step2NextBtn').style.display = 'flex';
+    }
+  }, 700);
+}
+
+function renderSummary() {
+  const stopC = analysisResults.filter(r=>r.status==='STOP').length;
+  const holdC = analysisResults.filter(r=>r.status==='HOLD').length;
+  const passC = analysisResults.filter(r=>r.status==='PASS').length;
+  const cfgs = {
+    STOP:{ cls:'result-stop', icon:'🛑', title_en:'STOP — Certification Not Processable', title_kr:'진행 불가', sub_en:`${stopC} prohibited ingredient(s) found. Reformulation required.`, sub_kr:`금지 성분 ${stopC}개 발견. 성분 재구성 필요.` },
+    HOLD:{ cls:'result-hold', icon:'⏸', title_en:'HOLD — Additional Documentation Required', title_kr:'보류', sub_en:`${holdC} ingredient(s) require additional documentation.`, sub_kr:`${holdC}개 성분 추가 서류 필요.` },
+    PASS:{ cls:'result-pass', icon:'✅', title_en:'PASS — Ready for Certification Review', title_kr:'진행 가능', sub_en:'All ingredients permissible.', sub_kr:'모든 성분 허용 가능.' }
+  };
+  const c = cfgs[overallStatus];
+  document.getElementById('resultSummaryBox').innerHTML = `
+    <div class="result-summary ${c.cls}">
+      <div class="result-icon">${c.icon}</div>
+      <div class="result-title">${c.title_en}</div>
+      <div style="font-size:12px;opacity:0.7;margin-bottom:6px;">${c.title_kr}</div>
+      <div style="font-size:13px;color:var(--text2);">${c.sub_en}</div>
+      <div style="font-size:11px;color:var(--text3);">${c.sub_kr}</div>
+      <hr style="margin:12px 0;border-color:rgba(255,255,255,0.08);">
+      <div style="display:flex;gap:20px;font-family:var(--mono);font-size:12px;">
+        <span style="color:var(--red);">STOP: ${stopC}</span>
+        <span style="color:var(--yellow);">HOLD: ${holdC}</span>
+        <span style="color:var(--green);">PASS: ${passC}</span>
+      </div>
+    </div>`;
+}
+
+function renderIngredientResults() {
+  const div = document.getElementById('ingredientResults');
+  const isConsultant = currentRole === 'consultant';
+  const toShow = isConsultant ? analysisResults : analysisResults.filter(r=>r.status!=='PASS');
+  if (toShow.length===0) {
+    div.innerHTML = '<div style="color:var(--green);padding:12px 0;font-size:13px;">✓ All ingredients passed. 모든 성분 통과.</div>';
+    return;
+  }
+  const sc = { STOP:{b:'badge-stop',l:'STOP'}, HOLD:{b:'badge-hold',l:'HOLD'}, PASS:{b:'badge-ok',l:'PASS'} };
+  div.innerHTML = toShow.map(r => {
+    const s = sc[r.status]||sc.PASS;
+    const showDetail = r.status !== 'PASS' || r.unclassified;
+
+    const layerBadge =
+      r.matchLayer === 1   ? `<span style="font-family:var(--mono);font-size:9px;color:var(--accent);background:rgba(110,231,183,0.06);border:1px solid rgba(110,231,183,0.15);padding:1px 5px;border-radius:3px;margin-left:6px;">RULE DB</span>` :
+      r.matchLayer === 1.5 ? `<span style="font-family:var(--mono);font-size:9px;color:#a78bfa;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);padding:1px 5px;border-radius:3px;margin-left:6px;">DECOMPOSED</span>` :
+      r.matchLayer === 2   ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;">PATTERN</span>` :
+      r.matchLayer === 3   ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;">KEYWORD</span>` :
+      r.unclassified       ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;">UNLISTED</span>` : '';
+
+    const decomposedInfo = r.matchLayer === 1.5 && r.decomposedFrom
+      ? `<div style="font-size:11px;color:#a78bfa;margin-top:4px;font-family:var(--mono);">⟶ ${r.decomposedFrom.join(' + ')}</div>`
+      : '';
+
+    // 성분별 required docs 자동 생성
+    const reqDocs = (r.status !== 'PASS' && isConsultant) ? getRequiredDocs(r) : null;
+    const reqDocsHtml = reqDocs && reqDocs.docs_en.length > 0 ? `
+      <div style="margin-top:8px;padding:8px 12px;background:rgba(234,179,8,0.04);border:1px solid rgba(234,179,8,0.15);border-radius:4px;">
+        <div style="font-size:10px;color:var(--yellow);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.06em;">REQUIRED DOCUMENTS 필요 서류</div>
+        ${reqDocs.docs_en.map((doc,i) => `
+          <div style="font-size:11px;color:var(--text2);margin-bottom:3px;">
+            <span style="color:var(--text3);margin-right:6px;">▸</span>${doc}
+            <span style="color:var(--text3);display:block;margin-left:14px;font-size:10px;">${reqDocs.docs_kr[i]||''}</span>
+          </div>`).join('')}
+        ${reqDocs.note_en ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);font-style:italic;">${reqDocs.note_en}</div>` : ''}
+      </div>` : '';
+
+    const unclassifiedNote = r.unclassified && isConsultant ? `
+      <div style="font-size:11px;color:var(--text3);margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:4px;border-left:2px solid var(--border2);">
+        Not in current Rule DB — treated as low-risk for preliminary review. Consultant verification recommended.<br>
+        <span style="color:var(--text3);">현재 규칙 DB 미등록 성분. 컨설턴트 직접 확인 권장.</span>
+      </div>` : '';
+
+    return `
+      <div class="ingredient-row">
+        <div style="flex:1;">
+          <div class="ing-name">
+            ${r.input}${r.input!==r.canonical?`<span class="ing-canonical">→ ${r.canonical}</span>`:''}
+            ${layerBadge}
+          </div>
+          ${decomposedInfo}
+          ${showDetail && r.rule_ref ? `
+            <div class="ing-detail">
+              <div>${r.reason_en}</div>
+              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr}</div>
+              <div style="margin-top:6px;"><span class="rule-ref">${r.rule_ref}</span></div>
+              ${isConsultant && r.article_text ? `<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;">${r.article_text}</div>` : ''}
+            </div>` : ''}
+          ${reqDocsHtml}
+          ${unclassifiedNote}
+        </div>
+        <span class="badge ${s.b}" style="flex-shrink:0;margin-top:2px;">${s.l}</span>
+      </div>`;
+  }).join('');
+}
+
+function renderConsultantGuide() {
+  const panel = document.getElementById('consultantGuidePanel');
+  const div = document.getElementById('consultantGuide');
+  if (currentRole !== 'consultant') { panel.style.display='none'; return; }
+  const items = analysisResults.filter(r=>r.status==='STOP'||r.status==='HOLD');
+  if (items.length===0) { panel.style.display='none'; return; }
+  panel.style.display = 'block';
+  div.innerHTML = items.map(r=>`
+    <div style="margin-bottom:20px;">
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
+        <span class="badge ${r.status==='STOP'?'badge-stop':'badge-hold'}">${r.status}</span>
+        <span style="font-family:var(--mono);font-size:12px;">${r.canonical||r.input}</span>
+        ${r.rule_ref?`<span class="rule-ref">${r.rule_ref}</span>`:''}
+        ${r.matchLayer===2?`<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;">PATTERN</span>`:''}
+        ${r.matchLayer===3?`<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;">KEYWORD</span>`:''}
+      </div>
+      ${r.reason_en?`
+        <div class="guide-box">
+          <div class="guide-title">REGULATORY BASIS 규정 근거</div>
+          <div style="color:var(--text2);font-size:11px;margin-bottom:8px;">${r.article_text||'—'}</div>
+          <div class="guide-title" style="margin-top:8px;">RESOLUTION GUIDE 해결 방법</div>
+          <div>${r.guide_en||r.reason_en}</div>
+          <div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_kr||r.reason_kr}</div>
+          <div style="margin-top:6px;">
+            ${r.replaceable?'<span class="tag">REPLACEMENT REQUIRED 대체 성분 필요</span>':'<span class="tag">DOCUMENTATION REQUIRED 서류 보완 필요</span>'}
+          </div>
+        </div>`:''}
+    </div>`).join('');
+}
+
+function populateStep3Issues() {
+  const div = document.getElementById('step3IssueIngredients');
+  const issues = analysisResults.filter(r=>r.status==='STOP'||r.status==='HOLD');
+  if (issues.length===0) { div.innerHTML=''; return; }
+  div.innerHTML = `
+    <div class="section-title">Flagged Ingredients from Step 2 — Priority Evidence Required<br><span style="font-family:var(--sans);letter-spacing:0;">Step 2에서 식별된 문제 성분 — 우선 증빙 필요</span></div>
+    ${issues.map(r=>`
+      <div class="ingredient-row">
+        <div style="flex:1;">
+          <div class="ing-name">${r.canonical||r.input}</div>
+          <div class="ing-detail">
+            <div>${r.reason_en||'—'}</div>
+            <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+            <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
+            ${r.guide_en?`<div style="margin-top:4px;font-size:11px;color:var(--text3);">→ ${r.guide_en}</div>`:''}
+          </div>
+        </div>
+        <span class="badge ${r.status==='STOP'?'badge-stop':'badge-hold'}" style="flex-shrink:0;">${r.status}</span>
+      </div>`).join('')}`;
+}
+
+// ============================================================
+// FINAL REPORT (STEP 7)
+// ============================================================
+function generateFinalReport() {
+  const brand     = document.getElementById('brandName').value || '—';
+  const product   = document.getElementById('productName').value || 'Unnamed Product';
+  const type      = document.getElementById('productType').value || '—';
+  const method    = document.getElementById('mfgMethod').value || '—';
+  const market    = document.getElementById('certMarket').value || '—';
+  const contact   = document.getElementById('contactName').value || '—';
+  const email     = document.getElementById('contactEmail').value || '—';
+  const phone     = document.getElementById('contactPhone').value || '—';
+  const company   = document.getElementById('companyName').value || '—';
+  const isConsultant = currentRole === 'consultant';
+
+  const stopItems = analysisResults.filter(r=>r.status==='STOP');
+  const holdItems = analysisResults.filter(r=>r.status==='HOLD');
+
+  // Checklist issues from steps 1-6
+  const docIssues = collectDocumentIssues();
+
+  const cfgs = {
+    STOP:{ cls:'result-stop', icon:'🛑', title_en:'STOP — Certification Not Processable', title_kr:'진행 불가 — 인증 진행 불가' },
+    HOLD:{ cls:'result-hold', icon:'⏸', title_en:'HOLD — Additional Documentation Required', title_kr:'보류 — 추가 서류 필요' },
+    PASS:{ cls:'result-pass', icon:'✅', title_en:'PASS — Ready to Proceed', title_kr:'진행 가능' }
+  };
+  const sc = cfgs[overallStatus];
+  const now = new Date().toLocaleString('ko-KR');
+
+  document.getElementById('finalReport').innerHTML = `
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-step">STEP 7</span>
+        <span class="panel-title">Risk Branch Report <span class="panel-title-kr">리스크 분기 결과</span></span>
+      </div>
+      <div class="panel-body">
+
+        <div class="result-summary ${sc.cls}">
+          <div class="result-icon">${sc.icon}</div>
+          <div class="result-title">${sc.title_en}</div>
+          <div style="font-size:12px;opacity:0.7;">${sc.title_kr}</div>
+        </div>
+
+        <div class="section-title">Case Information 케이스 정보</div>
+        <div class="info-row"><span class="info-key">BRAND</span><span>${brand}</span></div>
+        <div class="info-row"><span class="info-key">PRODUCT</span><span>${product}</span></div>
+        <div class="info-row"><span class="info-key">TYPE</span><span>${type}</span></div>
+        <div class="info-row"><span class="info-key">MFG METHOD</span><span>${method}</span></div>
+        <div class="info-row"><span class="info-key">TARGET MARKET</span><span>${market}</span></div>
+        <div class="info-row"><span class="info-key">CONTACT</span><span>${contact} &nbsp;|&nbsp; ${email} &nbsp;|&nbsp; ${phone}</span></div>
+        <div class="info-row"><span class="info-key">COMPANY</span><span>${company}</span></div>
+        <div class="info-row"><span class="info-key">REVIEWED AT</span><span style="font-family:var(--mono);font-size:11px;">${now}</span></div>
+        <div class="info-row"><span class="info-key">RULE DB</span><span style="font-family:var(--mono);font-size:11px;">${RULE_DB.version}</span></div>
+
+        ${stopItems.length>0 ? `
+          <div class="section-title" style="color:var(--red);">🛑 Prohibited Ingredients — Reformulation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--red);">금지 성분 — 성분 재구성 필요</span></div>
+          ${stopItems.map(r=>`
+            <div class="ingredient-row">
+              <div style="flex:1;">
+                <div class="ing-name">${r.canonical||r.input}</div>
+                <div class="ing-detail">
+                  <div>${r.reason_en||'—'}</div>
+                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+                  <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
+                  ${isConsultant&&r.article_text?`<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;">${r.article_text}</div><div class="guide-box" style="margin-top:8px;"><div class="guide-title">RESOLUTION 해결 방법</div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_kr||r.reason_kr}</div></div>`:''}
+                </div>
+              </div>
+              <span class="badge badge-stop" style="flex-shrink:0;margin-top:2px;">STOP</span>
+            </div>`).join('')}
+        ` : ''}
+
+        ${holdItems.length>0 ? `
+          <div class="section-title" style="color:var(--yellow);">⏸ Conditional Ingredients — Documentation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);">조건부 성분 — 서류 보완 필요</span></div>
+          ${holdItems.map(r=>`
+            <div class="ingredient-row">
+              <div style="flex:1;">
+                <div class="ing-name">${r.canonical||r.input}</div>
+                <div class="ing-detail">
+                  <div>${r.reason_en||'—'}</div>
+                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+                  <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
+                  ${isConsultant?`<div class="guide-box" style="margin-top:8px;"><div class="guide-title">REQUIRED DOCUMENTS 필요 서류</div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_kr||r.reason_kr}</div></div>`:''}
+                </div>
+              </div>
+              <span class="badge badge-hold" style="flex-shrink:0;margin-top:2px;">HOLD</span>
+            </div>`).join('')}
+        ` : ''}
+
+        ${docIssues.length>0 ? `
+          <div class="section-title" style="color:var(--yellow);">📄 Document Checklist Issues — Submission Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);">서류 체크리스트 미제출 항목</span></div>
+          ${docIssues.map(d=>`
+            <div class="checklist-item">
+              <div class="check-icon check-no">✕</div>
+              <div class="check-label" style="flex:1;">${d.label}<span class="check-label-kr">${d.step}</span></div>
+              <span class="badge badge-hold">MISSING</span>
+            </div>`).join('')}
+        ` : ''}
+
+        ${overallStatus==='PASS'&&docIssues.length===0 ? `
+          <div style="color:var(--green);font-size:13px;padding:16px 0;">
+            ✓ All ingredients cleared and documents submitted. Ready to proceed.<br>
+            <span style="color:var(--text3);font-size:11px;">모든 성분 통과, 서류 제출 완료. 인증 진행 가능.</span>
+          </div>` : ''}
+
+        <div class="btn-row" style="margin-top:24px;">
+          <button class="btn btn-ghost" onclick="prevStep(7)">← Back</button>
+          <button class="btn btn-ghost" onclick="resetAll()">↺ New Case 새 케이스</button>
+        </div>
+      </div>
+    </div>`;
+}
+
+function collectDocumentIssues() {
+  const checks = [
+    { id:'f1_1', label:'Business Registration Certificate', step:'Step 1 — 사업자등록증' },
+    { id:'f1_2', label:'Factory Information Document', step:'Step 1 — 공장 정보' },
+    { id:'f3_1', label:'Specification Sheets', step:'Step 3 — 원료 규격서' },
+    { id:'f3_5', label:'Origin Declaration', step:'Step 3 — 원료 유래 설명서' },
+    { id:'f4_1', label:'Process Flow Diagram', step:'Step 4 — 공정도' },
+    { id:'f5_1', label:'Halal Policy Declaration', step:'Step 5 — 할랄 방침 선언문' },
+    { id:'f5_2', label:'PHT Appointment Document', step:'Step 5 — 할랄 담당자 지정서' },
+    { id:'f6_1', label:'Label Draft', step:'Step 6 — 라벨 시안' },
+  ];
+  return checks.filter(c => !uploadedFiles[c.id]);
+}
+
+function resetAll() {
+  analysisResults = [];
+  overallStatus = 'PASS';
+  uploadedFiles = {};
+  document.getElementById('productName').value='';
+  document.getElementById('brandName').value='';
+  document.getElementById('productType').value='';
+  document.getElementById('mfgMethod').value='';
+  document.getElementById('certMarket').value='';
+  document.getElementById('contactName').value='';
+  document.getElementById('contactEmail').value='';
+  document.getElementById('ingredientInput').value='';
+  document.getElementById('analysisResult').style.display='none';
+  showPage(0);
+}
+</script>
+</body>
+</html>
