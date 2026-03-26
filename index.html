@@ -1004,7 +1004,7 @@ const RULE_DB = {
 
     // ── HOLD: 알코올류 ──
     { id:"R012", canonical:"Ethanol",
-      aliases:["ethanol","ethyl alcohol","alcohol denat","alcohol","denatured alcohol","sd alcohol","sd alcohol 40","sd alcohol 39-c","sd alcohol 40-b","specially denatured alcohol","anhydrous ethanol","absolute alcohol","grain alcohol","fermentation alcohol","에탄올","에틸알코올","알코올","변성 알코올","알코올 데나트"],
+      aliases:["ethanol","ethyl alcohol","alcohol denat","denatured alcohol","sd alcohol","sd alcohol 40","sd alcohol 39-c","sd alcohol 40-b","specially denatured alcohol","anhydrous ethanol","absolute alcohol","grain alcohol","fermentation alcohol","에탄올","에틸알코올","알코올","변성 알코올","알코올 데나트"],
       status:"HOLD", category:"Alcohol",
       reason_en:"Conditionally permitted in cosmetics if not khamr-derived. Origin declaration mandatory.",
       reason_kr:"발효 음료(캄르) 유래가 아닌 경우 화장품에 조건부 허용. 원료 유래 선언서 필수.",
@@ -2053,19 +2053,30 @@ function matchIngredient(name) {
   const nOriginal = name.toLowerCase().trim();
 
   // ── Layer 1: INCI 표준명 기반 정밀 매칭 ──
+  // 더 긴 alias가 더 구체적 — 매 규칙마다 가장 긴 alias부터 검사
+  let bestMatch = null;
+  let bestAliasLen = 0;
+
   for (const rule of RULE_DB.rules) {
-    for (const alias of rule.aliases) {
+    // aliases를 길이 내림차순으로 정렬해 더 구체적인 것 먼저
+    const sortedAliases = [...rule.aliases].sort((a,b) => b.length - a.length);
+    for (const alias of sortedAliases) {
       const a = alias.toLowerCase().trim();
+      let matched = false;
       // 1) 완전 일치
-      if (n === a) return { ...rule, matchLayer: 1 };
-      // 2) 순방향 포함: 입력(n)이 alias(a)를 단어 경계로 포함 (alias 4자 이상)
-      //    "porcine gelatin cream" ⊃ "porcine gelatin" → OK
-      //    역방향 금지: alias가 입력보다 길면 매칭 안 함
-      if (a.length >= 4 && a.length <= n.length && wordBoundaryMatch(n, a)) {
-        return { ...rule, matchLayer: 1 };
+      if (n === a) matched = true;
+      // 2) 순방향 포함: alias 길이 <= 입력 길이, alias 4자 이상
+      else if (a.length >= 4 && a.length <= n.length && wordBoundaryMatch(n, a)) matched = true;
+
+      if (matched && a.length > bestAliasLen) {
+        bestMatch = { ...rule, matchLayer: 1 };
+        bestAliasLen = a.length;
+        // 완전 일치면 바로 확정
+        if (n === a) break;
       }
     }
   }
+  if (bestMatch) return bestMatch;
 
   // ── Layer 1.5: Decomposition Map — 성분 계보 분해 ──
   // 입력된 성분명이 Decomposition Map에 있으면
@@ -2209,7 +2220,13 @@ function analyzeIngredients() {
     let hasStop = false, hasHold = false;
     ingredients.forEach(ing => {
       const match = matchIngredient(ing);
-      const r = { input: ing, canonical: match.canonical || ing, status: match.status, rule: (match.id ? match : null) };
+      // match의 모든 속성을 r에 직접 전개 — rule_ref, reason_en, guide_en 등 모두 포함
+      const r = {
+        ...match,
+        input: ing,
+        canonical: match.canonical || ing,
+        status: match.status || 'PASS',
+      };
       analysisResults.push(r);
       if (r.status==='STOP') hasStop = true;
       if (r.status==='HOLD') hasHold = true;
