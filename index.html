@@ -881,7 +881,7 @@ const RULE_DB = {
   rules: [
     // ── STOP: 돼지 유래 ──
     { id:"R001", canonical:"Porcine Gelatin",
-      aliases:["porcine gelatin","gelatin (pork)","pig gelatin","swine gelatin","gelatin","gelatine","hydrolyzed gelatin","hydrolysed gelatin","gelatin hydrolysate","collagen hydrolysate (porcine)","sus scrofa collagen","porcine hide gelatin","porcine bone gelatin","돼지 젤라틴","돼지 유래 젤라틴","gelatin babi"],
+      aliases:["porcine gelatin","gelatin (pork)","pig gelatin","swine gelatin","gelatine (porcine)","hydrolyzed porcine gelatin","porcine gelatin hydrolysate","sus scrofa collagen extract","porcine hide gelatin","porcine bone gelatin","돼지 젤라틴","돼지 유래 젤라틴","gelatin babi"],
       status:"STOP", category:"Porcine-derived",
       reason_en:"Flagged as porcine (pig) derived — classified as non-compliant in this preliminary review per UU No.33/2014. Requires regulatory confirmation.",
       reason_kr:"돼지 유래로 분류 — 본 사전 검토 엔진 기준 비적합 판정. 규정 확인 필요.",
@@ -903,7 +903,7 @@ const RULE_DB = {
       replaceable:true },
 
     { id:"R003", canonical:"Porcine Collagen",
-      aliases:["porcine collagen","pig collagen","collagen (pork)","porcine hide collagen","porcine bone collagen","sus scrofa collagen","porcine collagen peptide","porcine soluble collagen","돼지 콜라겐","돼지 유래 콜라겐","kolagen babi"],
+      aliases:["porcine collagen","pig collagen","collagen (pork)","porcine hide collagen","porcine bone collagen","sus scrofa collagen","porcine collagen peptide","porcine soluble collagen","돼지 콜라겐","돼지 유래 콜라겐","kolagen babi","pork collagen","swine collagen"],
       status:"STOP", category:"Porcine-derived",
       reason_en:"Flagged as porcine-derived collagen — classified as non-compliant in this preliminary review.",
       reason_kr:"돼지 유래 콜라겐으로 분류 — 본 사전 검토 엔진 기준 비적합 판정.",
@@ -925,7 +925,7 @@ const RULE_DB = {
       replaceable:true },
 
     { id:"R005", canonical:"Pork-derived Hyaluronic Acid",
-      aliases:["hyaluronic acid (porcine)","sodium hyaluronate (pork)","porcine hyaluronic acid","porcine sodium hyaluronate","ha (porcine)","hyaluronan (porcine)","돼지 유래 히알루론산","asam hialuronat babi"],
+      aliases:["hyaluronic acid (porcine)","porcine hyaluronic acid","porcine sodium hyaluronate","porcine-derived hyaluronic acid","hyaluronic acid from porcine source","ha porcine","hyaluronan porcine","돼지 유래 히알루론산","asam hialuronat babi"],
       status:"STOP", category:"Porcine-derived",
       reason_en:"Flagged as porcine-derived hyaluronic acid — classified as non-compliant in this preliminary review.",
       reason_kr:"돼지 유래 히알루론산으로 분류 — 본 사전 검토 엔진 기준 비적합 판정.",
@@ -948,7 +948,7 @@ const RULE_DB = {
       replaceable:true },
 
     { id:"R007", canonical:"Shellac",
-      aliases:["shellac","lac resin","e904","shellac resin","lac","laccifer lacca","shellac wax","dewaxed shellac","bleached shellac","orange shellac","셸락","락 수지","셸락 수지"],
+      aliases:["shellac","lac resin","e904","shellac resin","laccifer lacca","shellac wax","dewaxed shellac","bleached shellac","orange shellac","셸락","락 수지","셸락 수지"],
       status:"STOP", category:"Insect-derived",
       reason_en:"Flagged as insect-derived (lac insect) — classified as high-risk in this preliminary review per MUI Fatwa No.33/2011. Requires regulatory confirmation.",
       reason_kr:"곤충 유래(락 곤충)로 분류 — 본 사전 검토 기준 고위험 판정. 규정 확인 필요.",
@@ -970,7 +970,7 @@ const RULE_DB = {
       replaceable:true },
 
     { id:"R009", canonical:"Honey",
-      aliases:["honey","mel","mel extract","honey extract","honey powder","dried honey","raw honey","manuka honey","apis mellifera honey","꿀","벌꿀","꿀 추출물","꿀 분말","madu","ekstrak madu"],
+      aliases:["honey","mel extract","honey extract","honey powder","dried honey","raw honey","manuka honey","apis mellifera honey","꿀","벌꿀","꿀 추출물","꿀 분말","madu","ekstrak madu"],
       status:"STOP", category:"Insect-derived",
       reason_en:"Flagged as bee-derived ingredient — classified as high-risk in this preliminary review under BPJPH insect-derived classification. Requires regulatory confirmation.",
       reason_kr:"꿀벌 유래 성분으로 분류 — BPJPH 곤충 유래 분류 기준 고위험 판정. 규정 확인 필요.",
@@ -1908,6 +1908,14 @@ const DECOMPOSITION_MAP = {
   "peg-150 stearate":           { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
   "peg-2 stearate":             { components:["stearic acid","ethylene glycol"], reaction:"esterification" },
   "peg-8 oleate":               { components:["oleic acid","ethylene glycol"], reaction:"esterification" },
+  "ceteareth-20":               { components:["cetearyl alcohol","ethylene oxide"], reaction:"ethoxylation" },
+  "ceteareth-12":               { components:["cetearyl alcohol","ethylene oxide"], reaction:"ethoxylation" },
+  "ceteareth-6":                { components:["cetearyl alcohol","ethylene oxide"], reaction:"ethoxylation" },
+  "ceteth-20":                  { components:["cetyl alcohol","ethylene oxide"], reaction:"ethoxylation" },
+  "steareth-20":                { components:["stearyl alcohol","ethylene oxide"], reaction:"ethoxylation" },
+  "steareth-2":                 { components:["stearyl alcohol","ethylene oxide"], reaction:"ethoxylation" },
+  "oleth-10":                   { components:["oleic acid","ethylene oxide"], reaction:"ethoxylation" },
+  "laureth-7":                  { components:["lauric acid","ethylene oxide"], reaction:"ethoxylation" },
   "peg-40 hydrogenated castor oil": { components:["castor oil","ethylene oxide"], reaction:"ethoxylation" },
   "peg-60 hydrogenated castor oil": { components:["castor oil","ethylene oxide"], reaction:"ethoxylation" },
 
@@ -2018,16 +2026,42 @@ function mergeStatus(statuses) {
 }
 
 // ── 4-Layer Matching Function ─────────────────────────────────
+// ── 매칭 원칙 ──────────────────────────────────────────────────
+// Layer 1은 INCI 표준명 기반 정밀 매칭만 허용
+// 2가지 매칭 방식:
+//   1) 완전 일치: "glycerin" === "glycerin"
+//   2) 순방향 포함: 입력이 alias를 단어 경계로 포함
+//      "porcine gelatin extract" ⊃ "porcine gelatin" → STOP
+// 역방향 포함 금지: alias가 입력을 포함하는 방향
+//   "porcine sodium hyaluronate" ⊃ "sodium hyaluronate" → 금지
+//   "sus scrofa collagen extract" ⊃ "collagen" → 금지
+// ──────────────────────────────────────────────────────────────
+
+function wordBoundaryMatch(text, pattern) {
+  // 패턴이 3자 이하이면 완전 일치만 허용
+  if (pattern.length <= 3) return text === pattern;
+  // 숫자만으로 구성되면 완전 일치만 허용
+  if (/^\d+$/.test(pattern)) return text === pattern;
+  // 단어 경계 기반 순방향 매칭: text 안에 pattern이 단어 단위로 있는지
+  const escaped = pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const regex = new RegExp(`(^|[^a-z0-9])${escaped}([^a-z0-9]|$)`);
+  return regex.test(text);
+}
+
 function matchIngredient(name) {
   const n = normalizeIng(name);
   const nOriginal = name.toLowerCase().trim();
 
-  // ── Layer 1: 명시적 Rule DB 매칭 ──
+  // ── Layer 1: INCI 표준명 기반 정밀 매칭 ──
   for (const rule of RULE_DB.rules) {
     for (const alias of rule.aliases) {
-      if (n === alias.toLowerCase() ||
-          n.includes(alias.toLowerCase()) ||
-          alias.toLowerCase().includes(n)) {
+      const a = alias.toLowerCase().trim();
+      // 1) 완전 일치
+      if (n === a) return { ...rule, matchLayer: 1 };
+      // 2) 순방향 포함: 입력(n)이 alias(a)를 단어 경계로 포함 (alias 4자 이상)
+      //    "porcine gelatin cream" ⊃ "porcine gelatin" → OK
+      //    역방향 금지: alias가 입력보다 길면 매칭 안 함
+      if (a.length >= 4 && a.length <= n.length && wordBoundaryMatch(n, a)) {
         return { ...rule, matchLayer: 1 };
       }
     }
