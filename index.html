@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>PreHalal — Pre-Certification Review System v0.5</title>
+<title>PreHalal — Pre-Certification Review System v0.7</title>
 <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Noto+Sans+KR:wght@300;400;500&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
   :root {
@@ -167,7 +167,7 @@
 <body class="manufacturer">
 
 <header>
-  <div class="logo">Pre<span>X</span> / PreHalal <span style="color:var(--text3);font-size:11px;margin-left:8px;">PoC v0.5</span></div>
+  <div class="logo">Pre<span>X</span> / PreHalal <span style="color:var(--text3);font-size:11px;margin-left:8px;">PoC v0.7</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
     <span class="role-label">VIEW MODE</span>
     <div class="role-toggle">
@@ -245,7 +245,7 @@
             <option value="UAE (ESMA)">UAE (ESMA)</option>
           </select>
           <div style="margin-top:6px;padding:7px 10px;background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.15);border-radius:4px;font-size:11px;color:var(--text3);">
-            ⚠ PoC v0.5: Rule DB is currently Indonesia (BPJPH) based. Market-specific rule localization (Malaysia JAKIM / UAE ESMA) is planned for MVP.<br>
+            ⚠ PoC v0.7: Rule DB is currently Indonesia (BPJPH) based. Market-specific rule localization (Malaysia JAKIM / UAE ESMA) is planned for MVP.<br>
             <span style="color:var(--text3);">현재 Rule DB는 인도네시아(BPJPH) 기준입니다. 시장별 규칙 분기는 MVP에서 구현 예정입니다.</span>
           </div>
         </div>
@@ -446,8 +446,28 @@
         </div>
         <div class="field">
           <label>Full Ingredient List <span class="kr">/ 전성분 리스트 (필수)</span></label>
-          <textarea id="ingredientInput" placeholder="Paste your full ingredient list here (one per line or comma-separated)&#10;전성분을 여기에 붙여넣으세요 (줄바꿈 또는 쉼표 구분)&#10;&#10;Test example:&#10;Water, Glycerin, Lactic Acid, Porcine Gelatin, Ethanol, Cetyl Alcohol, Carmine, Sodium Lauryl Sulfate, Tocopherol, Fragrance"></textarea>
+
+          <!-- 입력 방식 안내 -->
+          <div style="margin-bottom:10px;padding:10px 14px;background:rgba(110,231,183,0.04);border:1px solid rgba(110,231,183,0.12);border-radius:6px;font-size:12px;color:var(--text2);">
+            <span style="font-family:var(--mono);font-size:10px;color:var(--accent);display:block;margin-bottom:6px;letter-spacing:0.06em;">INPUT FORMAT 입력 형식</span>
+            Enter each ingredient as: <span style="font-family:var(--mono);color:var(--text);">Ingredient Name | Supplier/Brand (optional)</span><br>
+            <span style="color:var(--text3);font-size:11px;">성분명 | 공급사/브랜드명 (선택 입력) — 공급사 입력 시 BPJPH 인증 상태 조회 가능 (MVP 예정)</span>
+            <div style="margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--text3);">
+              예) Glycerin | KLK Oleomas<br>
+              예) Ethanol | PT. Indo Acidatama<br>
+              예) Water (공급사 없으면 성분명만 입력)
+            </div>
+          </div>
+
+          <textarea id="ingredientInput" placeholder="Paste your full ingredient list here (one per line or comma-separated)&#10;전성분을 여기에 붙여넣으세요 (줄바꿈 또는 쉼표 구분)&#10;&#10;Test example:&#10;Water, Glycerin, Lactic Acid, Porcine Gelatin, Ethanol, Fragrance, Cetearyl Alcohol"></textarea>
           <div class="hint">// Copy from Excel and paste directly. 엑셀에서 복사 후 붙여넣기 가능</div>
+
+          <!-- BPJPH 자동 조회 안내 (MVP 예정) -->
+          <div style="margin-top:10px;padding:10px 14px;background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.15);border-radius:6px;font-size:12px;color:var(--text2);">
+            <span style="font-family:var(--mono);font-size:10px;color:#818cf8;display:block;margin-bottom:4px;letter-spacing:0.06em;">🔍 BPJPH CERTIFICATE LOOKUP — MVP 예정</span>
+            When a supplier/brand name is entered, PreHalal will automatically retrieve the BPJPH halal certificate number, manufacturer, and issuance date from the BPJPH database — eliminating manual lookup on halal.go.id.<br>
+            <span style="color:var(--text3);font-size:11px;">공급사명 입력 시 BPJPH 데이터베이스에서 할랄 인증 번호, 제조사, 발급일을 자동 조회합니다. halal.go.id 수동 검색이 불필요해집니다.</span>
+          </div>
         </div>
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="prevStep(2)">← Back</button>
@@ -579,6 +599,94 @@
             <input type="file" id="f3_7" multiple onchange="markUploaded('f3_7','ci3_7','s3_7')" />
             <span class="upload-zone-label">📎 Upload / 업로드</span>
             <span class="upload-status not-uploaded" id="s3_7">Not uploaded</span>
+          </label>
+        </div>
+
+        <!-- 포장재 섹션 -->
+        <div class="section-title" style="margin-top:28px;">
+          Packaging Materials 포장재
+        </div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
+          Packaging materials are subject to halal review under BPJPH regulations.<br>
+          <span style="color:var(--text3);">포장재도 BPJPH 규정상 할랄 검토 대상입니다.</span>
+        </p>
+
+        <div style="margin-bottom:12px;padding:10px 14px;background:rgba(234,179,8,0.04);border:1px solid rgba(234,179,8,0.15);border-radius:6px;font-size:12px;color:var(--text2);">
+          <span style="font-family:var(--mono);font-size:10px;color:var(--yellow);display:block;margin-bottom:4px;letter-spacing:0.06em;">📅 REGULATORY TIMELINE 규정 일정</span>
+          <b style="color:var(--text);">Until October 2026:</b> Non-porcine declaration letter required for packaging.<br>
+          <b style="color:var(--text);">From October 2026:</b> Full halal certification required for packaging materials.<br>
+          <span style="color:var(--text3);font-size:11px;">2026년 10월까지: 포장재 비돼지 유래 선언서만 필요 / 2026년 10월 이후: 포장재 할랄 인증서 의무화</span>
+        </div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_8">!</div>
+          <div class="check-label" style="flex:1;">
+            Non-Porcine Declaration for Packaging Materials
+            <span class="check-label-kr">포장재 비돼지 유래 선언서 (현재 필수)</span>
+            <span style="display:block;font-size:11px;color:var(--accent2);margin-top:2px;">✓ Required now — Until October 2026</span>
+          </div>
+          <label class="upload-zone" onclick="triggerUpload('f3_8')">
+            <input type="file" id="f3_8" multiple onchange="markUploaded('f3_8','ci3_8','s3_8')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_8">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="checklist-item" style="opacity:0.6;">
+          <div class="check-icon" style="background:var(--surface2);border-color:var(--border2);color:var(--text3);font-size:10px;">📅</div>
+          <div class="check-label" style="flex:1;">
+            Halal Certificate for Packaging Materials
+            <span class="check-label-kr">포장재 할랄 인증서</span>
+            <span style="display:block;font-size:11px;color:var(--yellow);margin-top:2px;">⚠ Required from October 2026 — Prepare in advance</span>
+          </div>
+          <div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:0 12px;">UPCOMING</div>
+        </div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_9">!</div>
+          <div class="check-label" style="flex:1;">
+            Packaging Material Specification Sheet
+            <span class="check-label-kr">포장재 규격서 (재질, 성분 정보)</span>
+          </div>
+          <label class="upload-zone" onclick="triggerUpload('f3_9')">
+            <input type="file" id="f3_9" multiple onchange="markUploaded('f3_9','ci3_9','s3_9')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_9">Not uploaded</span>
+          </label>
+        </div>
+
+        <!-- 세척제 섹션 -->
+        <div class="section-title" style="margin-top:28px;">
+          Cleaning Agents 세척제
+        </div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
+          Cleaning agents used on production equipment must also be halal-compliant under BPJPH SJPH requirements.<br>
+          <span style="color:var(--text3);">생산 설비에 사용되는 세척제도 BPJPH SJPH 기준상 할랄 적합 여부 확인이 필요합니다.</span>
+        </p>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_10">!</div>
+          <div class="check-label" style="flex:1;">
+            Cleaning Agent List (all agents used in production)
+            <span class="check-label-kr">세척제 목록 (생산 공정 전체)</span>
+          </div>
+          <label class="upload-zone" onclick="triggerUpload('f3_10')">
+            <input type="file" id="f3_10" multiple onchange="markUploaded('f3_10','ci3_10','s3_10')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_10">Not uploaded</span>
+          </label>
+        </div>
+
+        <div class="checklist-item">
+          <div class="check-icon check-add" id="ci3_11">!</div>
+          <div class="check-label" style="flex:1;">
+            Halal Certificate or Origin Declaration for Cleaning Agents
+            <span class="check-label-kr">세척제 할랄 인증서 또는 원료 유래 선언서</span>
+          </div>
+          <label class="upload-zone" onclick="triggerUpload('f3_11')">
+            <input type="file" id="f3_11" multiple onchange="markUploaded('f3_11','ci3_11','s3_11')" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s3_11">Not uploaded</span>
           </label>
         </div>
 
@@ -877,7 +985,7 @@
 // Source: UU No.33/2014, MUI Fatwa, HAS 23000:2020, SNI 99002:2016
 // ============================================================
 const RULE_DB = {
-  version: "0.4-sample",
+  version: "0.5-sample",
   rules: [
     // ── STOP: 돼지 유래 ──
     { id:"R001", canonical:"Porcine Gelatin",
@@ -2219,13 +2327,18 @@ function analyzeIngredients() {
     analysisResults = [];
     let hasStop = false, hasHold = false;
     ingredients.forEach(ing => {
-      const match = matchIngredient(ing);
-      // match의 모든 속성을 r에 직접 전개 — rule_ref, reason_en, guide_en 등 모두 포함
+      // "Ingredient | Supplier" 형식 파싱
+      const parts = ing.split('|').map(s=>s.trim());
+      const ingName = parts[0];
+      const supplier = parts[1] || null;
+
+      const match = matchIngredient(ingName);
       const r = {
         ...match,
-        input: ing,
-        canonical: match.canonical || ing,
+        input: ingName,
+        canonical: match.canonical || ingName,
         status: match.status || 'PASS',
+        supplier: supplier,  // 공급사명 저장
       };
       analysisResults.push(r);
       if (r.status==='STOP') hasStop = true;
@@ -2297,6 +2410,14 @@ function renderIngredientResults() {
       ? `<div style="font-size:11px;color:#a78bfa;margin-top:4px;font-family:var(--mono);">⟶ ${r.decomposedFrom.join(' + ')}</div>`
       : '';
 
+    // 공급사명 표시 + BPJPH 조회 상태
+    const supplierInfo = r.supplier ? `
+      <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
+        <span style="font-size:10px;color:var(--text3);font-family:var(--mono);">SUPPLIER</span>
+        <span style="font-size:11px;color:var(--text2);">${r.supplier}</span>
+        <span style="font-size:10px;color:#818cf8;font-family:var(--mono);padding:1px 6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:3px;">BPJPH LOOKUP — MVP 예정</span>
+      </div>` : '';
+
     // 성분별 required docs 자동 생성
     const reqDocs = (r.status !== 'PASS' && isConsultant) ? getRequiredDocs(r) : null;
     const reqDocsHtml = reqDocs && reqDocs.docs_en.length > 0 ? `
@@ -2323,6 +2444,7 @@ function renderIngredientResults() {
             ${r.input}${r.input!==r.canonical?`<span class="ing-canonical">→ ${r.canonical}</span>`:''}
             ${layerBadge}
           </div>
+          ${supplierInfo}
           ${decomposedInfo}
           ${showDetail && r.rule_ref ? `
             <div class="ing-detail">
