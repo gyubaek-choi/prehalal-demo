@@ -537,8 +537,8 @@
         <!-- HOLD/STOP ingredients re-shown -->
         <div id="step3IssueIngredients"></div>
 
-        <div class="section-title" style="margin-top:20px;">Required Documents per Ingredient 원료별 필수 서류</div>
-        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Upload supporting documents for each ingredient below. HOLD/STOP ingredients require priority attention.<br><span style="color:var(--text3);">아래 원료별 증빙 서류를 업로드하세요. HOLD/STOP 성분은 우선 처리 필요.</span></p>
+        <div class="section-title" style="margin-top:20px;">Bulk / Shared Upload (optional) 공통·일괄 업로드 (선택)</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Use the per-ingredient cards above for each flagged ingredient. This section is for documents that cover multiple ingredients at once (e.g., one CoA spanning several materials) or general spec sheets.<br><span style="color:var(--text3);">개별 원료 증빙은 위 카드에서 업로드하세요. 이 섹션은 한 문서가 여러 원료를 커버하거나(예: 여러 원료를 포함한 CoA) 전 성분 공통 규격서를 한 번에 올릴 때 사용합니다.</span></p>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_1">!</div>
@@ -1923,25 +1923,80 @@ function renderConsultantGuide() {
     </div>`).join('');
 }
 
+let step3IngredientDocs = [];
 function populateStep3Issues() {
   const div = document.getElementById('step3IssueIngredients');
   const issues = analysisResults.filter(r=>r.status==='STOP'||r.status==='HOLD');
+  step3IngredientDocs = [];
   if (issues.length===0) { div.innerHTML=''; return; }
-  div.innerHTML = `
-    <div class="section-title">Flagged Ingredients from Step 2 — Priority Evidence Required<br><span style="font-family:var(--sans);letter-spacing:0;">Step 2에서 식별된 문제 성분 — 우선 증빙 필요</span></div>
-    ${issues.map(r=>`
-      <div class="ingredient-row">
-        <div style="flex:1;">
-          <div class="ing-name">${r.canonical||r.input}</div>
-          <div class="ing-detail">
-            <div>${r.reason_en||'—'}</div>
-            <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
-            <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
-            ${r.guide_en?`<div style="margin-top:4px;font-size:11px;color:var(--text3);">→ ${r.guide_en}</div>`:''}
+  const cards = issues.map((r, idx) => {
+    const isStop = r.status==='STOP';
+    const rd = getRequiredDocs(r);
+    const docs_en = rd.docs_en || [];
+    const docs_kr = rd.docs_kr || [];
+    const fileIds = [];
+    const slots = docs_en.map((doc, j) => {
+      const fid = `ing${idx}_${j}`;
+      fileIds.push(fid);
+      return `
+        <div class="checklist-item" style="margin-top:8px;">
+          <div class="check-icon check-add" id="ci_${fid}">!</div>
+          <div class="check-label" style="flex:1;">${doc}<span class="check-label-kr">${docs_kr[j]||''}</span></div>
+          <label class="upload-zone" onclick="triggerUpload('${fid}')">
+            <input type="file" id="${fid}" multiple onchange="markIngredientDoc('${fid}','ci_${fid}','s_${fid}',${idx})" />
+            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-status not-uploaded" id="s_${fid}">Not uploaded</span>
+          </label>
+        </div>`;
+    }).join('');
+    step3IngredientDocs.push({ idx, fileIds, isStop });
+    const pill = isStop
+      ? `<span class="badge badge-stop" id="ingpill_${idx}" style="flex-shrink:0;">재구성 필요 / Reformulate</span>`
+      : `<span class="badge badge-hold" id="ingpill_${idx}" style="flex-shrink:0;">누락 / Missing</span>`;
+    const supplier = r.supplier ? `<div style="font-size:11px;color:var(--text2);margin-top:3px;"><span style="font-family:var(--mono);font-size:10px;color:var(--text3);">SUPPLIER</span> ${r.supplier}</div>` : '';
+    const body = isStop
+      ? `<div style="margin-top:10px;font-size:11px;color:var(--red);">${rd.note_en||''}<br><span style="color:var(--text3);">${rd.note_kr||''}</span></div>`
+      : `<div style="margin-top:10px;font-size:10px;color:var(--yellow);font-family:var(--mono);letter-spacing:0.06em;">이 원료에 필요한 증빙 · REQUIRED EVIDENCE</div>
+         ${slots}
+         ${rd.note_en?`<div style="margin-top:8px;font-size:11px;color:var(--text3);font-style:italic;">${rd.note_en} <span style="color:var(--text3);">${rd.note_kr||''}</span></div>`:''}`;
+    return `
+      <div class="ingredient-card" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:14px;background:var(--surface);">
+        <div style="display:flex;align-items:flex-start;gap:10px;">
+          <div style="flex:1;">
+            <div class="ing-name">${r.canonical||r.input}</div>
+            ${supplier}
+            <div class="ing-detail" style="margin-top:4px;">
+              <div>${r.reason_en||'—'}</div>
+              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+              <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
+            </div>
           </div>
+          ${pill}
         </div>
-        <span class="badge ${r.status==='STOP'?'badge-stop':'badge-hold'}" style="flex-shrink:0;">${r.status}</span>
-      </div>`).join('')}`;
+        ${body}
+      </div>`;
+  }).join('');
+  div.innerHTML = `
+    <div class="section-title">Flagged Ingredients from Step 2 — Per-Ingredient Evidence<br><span style="font-family:var(--sans);letter-spacing:0;">Step 2에서 식별된 문제 성분 — 원료별 증빙 업로드</span></div>
+    <p style="font-size:12px;color:var(--text2);margin:6px 0 14px;">Upload the evidence each ingredient needs in its own card below. Each ingredient shows its status (Missing / Partial / Complete).<br><span style="color:var(--text3);">아래 카드에서 원료별로 필요한 증빙을 업로드하세요. 원료마다 상태(누락 / 추가 필요 / 충족)가 표시됩니다.</span></p>
+    ${cards}`;
+}
+
+function markIngredientDoc(fileId, iconId, statusId, idx) {
+  markUploaded(fileId, iconId, statusId);
+  recomputeIngredientStatus(idx);
+}
+
+function recomputeIngredientStatus(idx) {
+  const entry = step3IngredientDocs.find(e=>e.idx===idx);
+  if (!entry || entry.isStop) return;
+  const pill = document.getElementById('ingpill_'+idx);
+  if (!pill) return;
+  const total = entry.fileIds.length;
+  const done = entry.fileIds.filter(fid=>uploadedFiles[fid]).length;
+  if (done===0) { pill.className='badge badge-hold'; pill.textContent='누락 / Missing'; }
+  else if (done<total) { pill.className='badge badge-hold'; pill.textContent='추가 필요 / Partial'; }
+  else { pill.className='badge badge-ok'; pill.textContent='충족 / Complete'; }
 }
 
 // ============================================================
@@ -2048,12 +2103,42 @@ function generateFinalReport() {
             <span style="color:var(--text3);font-size:11px;">모든 성분 통과, 서류 제출 완료. 인증 진행 가능.</span>
           </div>` : ''}
 
+        ${!isConsultant ? `
+          <div id="handoffBox" style="margin-top:24px;border:1px solid var(--accent);border-radius:8px;padding:16px 18px;background:rgba(110,231,183,0.04);">
+            <div class="section-title" style="margin-top:0;">Hand off to a Consulting Firm — Request Analysis<br><span style="font-family:var(--sans);letter-spacing:0;">컨설팅사에 분석 의뢰</span></div>
+            <p style="font-size:12px;color:var(--text2);margin:6px 0 12px;">You've uploaded all the documents you have. Send this case — with your uploads and analysis results — to a PreHalal partner consulting firm for full review and SiHalal submission prep.<br><span style="color:var(--text3);">가진 자료를 모두 업로드하셨습니다. 이 케이스(업로드 자료·분석 결과 포함)를 PreHalal 파트너 컨설팅사에 전달해 정밀 검토와 SiHalal 제출 준비를 의뢰할 수 있습니다.</span></p>
+            <div style="display:flex;flex-direction:column;gap:8px;">
+              <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="HalalEase Consulting" style="width:16px;height:16px;"> HalalEase Consulting</label>
+              <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="Amanah Halal Consulting" style="width:16px;height:16px;"> Amanah Halal Consulting</label>
+              <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="Nusantara Halal Partners" style="width:16px;height:16px;"> Nusantara Halal Partners</label>
+            </div>
+            <div style="font-size:10px;color:var(--text3);margin-top:8px;">* 예시 파트너사 — PreHalal을 사용하는 여러 컨설팅사 중 복수 선택 가능 · sample partners, multiple selection allowed</div>
+            <button class="btn btn-primary" style="margin-top:14px;" onclick="submitConsultingRequest()">자료 전달 및 분석 의뢰 · Send & Request →</button>
+          </div>
+        ` : ''}
+
         <div class="btn-row" style="margin-top:24px;">
           <button class="btn btn-ghost" onclick="prevStep(7)">← Back</button>
           <button class="btn btn-ghost" onclick="resetAll()">↺ New Case 새 케이스</button>
         </div>
       </div>
     </div>`;
+}
+
+function submitConsultingRequest() {
+  const boxes = document.querySelectorAll('.cf-pick:checked');
+  if (boxes.length === 0) { alert('분석을 의뢰할 컨설팅사를 1곳 이상 선택하세요.\nPlease select at least one consulting firm.'); return; }
+  const names = Array.from(boxes).map(b=>b.value);
+  const product = document.getElementById('productName').value || 'Unnamed Product';
+  const caseId = 'PHL-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
+  const box = document.getElementById('handoffBox');
+  box.innerHTML = `
+    <div style="font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:0.06em;margin-bottom:8px;">✓ REQUEST SUBMITTED 의뢰 접수됨</div>
+    <div style="font-size:14px;color:var(--text);margin-bottom:10px;">분석 의뢰가 접수되었습니다. The request has been submitted.</div>
+    <div class="info-row"><span class="info-key">CASE ID</span><span style="font-family:var(--mono);">${caseId}</span></div>
+    <div class="info-row"><span class="info-key">PRODUCT</span><span>${product}</span></div>
+    <div class="info-row"><span class="info-key">ASSIGNED TO</span><span>${names.join(', ')}</span></div>
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;">선택한 컨설팅사에 업로드한 모든 자료와 분석 결과가 전달됩니다. 컨설턴트가 케이스를 검토한 뒤 연락드립니다.<br>All uploaded documents and analysis results have been shared with the selected firm(s). The consultant will review the case and follow up.</div>`;
 }
 
 function collectDocumentIssues() {
