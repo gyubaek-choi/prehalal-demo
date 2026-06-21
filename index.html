@@ -1812,9 +1812,9 @@ function renderSummary() {
 function renderIngredientResults() {
   const div = document.getElementById('ingredientResults');
   const isConsultant = currentRole === 'consultant';
-  const toShow = isConsultant ? analysisResults : analysisResults.filter(r=>r.status!=='PASS');
+  const toShow = analysisResults;   // PASS 포함 — 모든 성분 표시 (제조사·컨설턴트 공통)
   if (toShow.length===0) {
-    div.innerHTML = '<div style="color:var(--green);padding:12px 0;font-size:13px;">✓ All ingredients passed. 모든 성분 통과.</div>';
+    div.innerHTML = '<div style="color:var(--text3);padding:12px 0;font-size:13px;">No ingredients analyzed. 분석된 성분이 없습니다.</div>';
     return;
   }
   const sc = { STOP:{b:'badge-stop',l:'STOP'}, HOLD:{b:'badge-hold',l:'HOLD'}, PASS:{b:'badge-ok',l:'PASS'} };
