@@ -308,14 +308,23 @@
       </div>
       <div class="panel-body">
 
+        <div class="guide-box" style="margin-bottom:18px;">
+          <div class="guide-title">BPJPH SJPH 기준 매핑</div>
+          아래 항목은 BPJPH 할랄 인증(SJPH)의 법인·생산시설 요건에 매핑됩니다. 항목별 근거는 골드 칩으로 표시됩니다.
+          국내 신청은 NIB 기반, 국외(SHLN) 신청은 본국 사업허가 + 수입자 NIB 기반으로 법인 서류가 달라집니다.
+          <span style="display:block;margin-top:4px;color:var(--text3);">※ 국외(SHLN) 전체 제출 목록은 현지 파트너 검증 후 확정 예정.</span>
+        </div>
+
         <div class="section-title">Corporate Documents 법인 서류</div>
 
         <!-- Business Registration -->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_1">!</div>
           <div class="check-label" style="flex:1;">
-            Business Registration Certificate
-            <span class="check-label-kr">사업자등록증</span>
+            Business Identity — NIB / Overseas License
+            <span class="check-label-kr">사업자 식별 — 국내: NIB / 국외(SHLN): 본국 사업허가 + 수입자 NIB</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">신청 루트에 따라 법인 서류가 달라집니다. 국내는 NIB, 국외는 본국 사업허가와 수입자 NIB.</span>
+            <span class="rule-ref">NIB · UU 33/2014 · SiHalal 등록</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_1')">
@@ -330,8 +339,10 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_2">!</div>
           <div class="check-label" style="flex:1;">
-            Factory Information Document
-            <span class="check-label-kr">공장 정보 문서</span>
+            Production Facility List &amp; Matrix
+            <span class="check-label-kr">생산시설 목록·식별 + 원료·제품·시설 매트릭스</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">SJPH 매뉴얼의 회사·시설 식별과 원료–제품–생산시설 매트릭스. (평면도는 아래 별도 항목)</span>
+            <span class="rule-ref">Manual SJPH · 시설 식별·매트릭스</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_2')">
@@ -346,8 +357,10 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_3">!</div>
           <div class="check-label" style="flex:1;">
-            Factory Location Map / Site Plan
-            <span class="check-label-kr">공장 위치 및 평면도</span>
+            Production Facility Layout
+            <span class="check-label-kr">생산시설 레이아웃 (Layout Fasilitas Produksi)</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">공장 위치·평면도. BPJPH 필수 제출 서류 중 하나.</span>
+            <span class="rule-ref">Layout Fasilitas Produksi · SJPH 필수서류</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_3')">
@@ -362,8 +375,10 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_4">!</div>
           <div class="check-label" style="flex:1;">
-            Subcontracting / OEM Agreement (if applicable)
-            <span class="check-label-kr">위탁 관계 설명서 (OEM/ODM 해당 시)</span>
+            Subcontracting / OEM (maklon) Agreement — if applicable
+            <span class="check-label-kr">위탁 관계 설명서 (OEM/ODM·maklon 해당 시)</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">SJPH 매뉴얼은 위탁생산(maklon)·임대창고 등 모든 관련 시설에 적용됩니다.</span>
+            <span class="rule-ref">Manual SJPH 적용범위 · maklon 포함</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_4')">
@@ -382,7 +397,8 @@
           <div class="check-label" style="flex:1;">
             Production Line Separation Declaration
             <span class="check-label-kr">할랄 전용 생산 라인 또는 공용 라인 구분 선언서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">State whether halal line is dedicated or shared. If shared, cross-contamination prevention plan required.</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">전용/공용 여부 선언. 공용이면 교차오염 방지 계획 필요.</span>
+            <span class="rule-ref">SJPH 절차 · 시설 najis 관리</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_5')">
@@ -399,7 +415,8 @@
           <div class="check-label" style="flex:1;">
             Non-Halal Product Co-Production Statement
             <span class="check-label-kr">동일 라인 비할랄 제품 생산 여부 확인서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">If non-halal products share the same line, cleaning procedure validation is mandatory.</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">공용 시 이슬람 율법에 따른 세척(penyucian) 절차 검증 필수.</span>
+            <span class="rule-ref">penyucian 세척절차 · SJPH 절차</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_6')">
@@ -416,7 +433,8 @@
           <div class="check-label" style="flex:1;">
             Raw Material Storage Separation Plan
             <span class="check-label-kr">원료 보관 창고 분리 계획서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Halal and non-halal raw materials must be stored separately (BPJPH HAS 23000).</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">할랄·비할랄 원료 분리 보관. 저장·운송 단계 najis 오염 방지.</span>
+            <span class="rule-ref">저장·운송 절차 · SJPH · HAS 23000</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_7')">
@@ -431,9 +449,10 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_8">!</div>
           <div class="check-label" style="flex:1;">
-            Halal Supervisor (PHT) Appointment Letter
-            <span class="check-label-kr">할랄 담당자(PHT) 지정서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Penyelia Halal — mandatory appointment under UU No.33/2014 Pasal 28.</span>
+            Halal Supervisor (Penyelia Halal) — Appointment Set
+            <span class="check-label-kr">할랄 감독관(Penyelia Halal) 관련 서류 일체</span>
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">지정서 + 신분증(KTP/ID) + 교육수료증 + BNSP 역량증명(중·대형 기업). UU 33/2014 Pasal 28.</span>
+            <span class="rule-ref">Surat Penetapan Penyelia Halal · BNSP</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_8')">
@@ -2180,8 +2199,8 @@ function submitConsultingRequest() {
 
 function collectDocumentIssues() {
   const checks = [
-    { id:'f1_1', label:'Business Registration Certificate', step:'Step 1 — 사업자등록증' },
-    { id:'f1_2', label:'Factory Information Document', step:'Step 1 — 공장 정보' },
+    { id:'f1_1', label:'Business Identity (NIB / Overseas License)', step:'Step 1 — 사업자 식별(NIB)' },
+    { id:'f1_2', label:'Production Facility List & Matrix', step:'Step 1 — 생산시설 목록·매트릭스' },
     { id:'f3_1', label:'Specification Sheets', step:'Step 3 — 원료 규격서' },
     { id:'f3_5', label:'Origin Declaration', step:'Step 3 — 원료 유래 설명서' },
     { id:'f4_1', label:'Process Flow Diagram', step:'Step 4 — 공정도' },
