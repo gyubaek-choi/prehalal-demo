@@ -229,15 +229,29 @@
     @media print{
       @page{margin:12mm;}
       html,body{background:#fff !important;}
-      header,.progress-bar,.btn-row,.print-hide{display:none !important;}
+      header,.progress-bar,.btn-row,.print-hide,.lib-overlay{display:none !important;}
       .page{display:none !important;}
-      #page7{display:block !important;}
+      #page6{display:block !important;}
       .container{max-width:none !important;margin:0 !important;padding:0 !important;}
       .panel{box-shadow:none !important;}
       *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
       .reg-row,.info-row,.result-summary,.guide-box,.checklist-item{break-inside:avoid;}
       .section-title{break-after:avoid;}
     }
+  
+    /* ---- reference library modal ---- */
+    .lib-overlay{display:none;position:fixed;inset:0;background:rgba(6,53,79,0.5);z-index:200;
+      align-items:flex-start;justify-content:center;padding:44px 20px;overflow-y:auto;}
+    .lib-modal{position:relative;background:var(--bg,#fff);border-radius:12px;max-width:940px;width:100%;
+      box-shadow:0 24px 70px rgba(0,0,0,.32);}
+    .lib-modal .panel{box-shadow:none;border:none;margin:0;}
+    .lib-badge{background:var(--accent2,#C2912F) !important;}
+    .lib-close{position:absolute;top:14px;right:16px;background:none;border:none;font-size:26px;line-height:1;
+      color:var(--text3,#9aa5ab);cursor:pointer;padding:0 4px;z-index:2;}
+    .lib-close:hover{color:var(--text,#111);}
+    .lib-btn{background:rgba(255,255,255,0.12);color:#fff;border:1px solid rgba(255,255,255,0.28);
+      border-radius:6px;padding:7px 12px;font-size:12px;font-weight:600;cursor:pointer;font-family:var(--sans);}
+    .lib-btn:hover{background:rgba(255,255,255,0.2);}
   </style>
 </head>
 <body class="manufacturer">
@@ -245,7 +259,8 @@
 <header>
   <div class="logo">Pre<span>X</span> / PreHalal <span style="color:rgba(255,255,255,0.55);font-size:11px;margin-left:8px;">PoC v0.8</span></div>
   <div style="display:flex;align-items:center;gap:12px;">
-    <span class="role-label">VIEW MODE</span>
+    <button class="lib-btn" onclick="toggleLibrary()">📚 Document Library</button>
+        <span class="role-label">VIEW MODE</span>
     <div class="role-toggle">
       <button class="role-btn active" onclick="setRole('manufacturer')">Manufacturer</button>
       <button class="role-btn" onclick="setRole('consultant')">Consultant</button>
@@ -256,25 +271,21 @@
 <div class="container">
   <!--PROGRESS BAR-->
   <div class="progress-bar" id="progressBar">
-    <div class="step-item"><div class="step-dot active" id="dot0" onclick="tryGoStep(0)" title="Product Registration">0</div></div>
-    <div class="step-line" id="line01"></div>
-    <div class="step-item"><div class="step-dot" id="dot1" onclick="tryGoStep(1)" title="Company Info">1</div></div>
-    <div class="step-line" id="line12"></div>
-    <div class="step-item"><div class="step-dot" id="dot2" onclick="tryGoStep(2)" title="Ingredients">2</div></div>
-    <div class="step-line" id="line23"></div>
-    <div class="step-item"><div class="step-dot" id="dot3" onclick="tryGoStep(3)" title="Raw Materials">3</div></div>
-    <div class="step-line" id="line34"></div>
-    <div class="step-item"><div class="step-dot" id="dot4" onclick="tryGoStep(4)" title="Process">4</div></div>
-    <div class="step-line" id="line45"></div>
-    <div class="step-item"><div class="step-dot" id="dot5" onclick="tryGoStep(5)" title="HAS/SJPH">5</div></div>
-    <div class="step-line" id="line56"></div>
-    <div class="step-item"><div class="step-dot" id="dot6" onclick="tryGoStep(6)" title="Labeling">6</div></div>
-    <div class="step-line" id="line67"></div>
-    <div class="step-item"><div class="step-dot" id="dot7" onclick="tryGoStep(7)" title="Risk Branch">7</div></div>
-  </div>
-
-  <!--========== STEP 0: Product Registration ==========-->
-  <div class="page active" id="page0">
+      <div class="step-item"><div class="step-dot active" id="dot0" onclick="tryGoStep(0)" title="Product Registration">0</div></div>
+      <div class="step-line" id="line01"></div>
+      <div class="step-item"><div class="step-dot" id="dot1" onclick="tryGoStep(1)" title="Company Info">1</div></div>
+      <div class="step-line" id="line12"></div>
+      <div class="step-item"><div class="step-dot" id="dot2" onclick="tryGoStep(2)" title="Ingredients">2</div></div>
+      <div class="step-line" id="line23"></div>
+      <div class="step-item"><div class="step-dot" id="dot3" onclick="tryGoStep(3)" title="Raw Materials">3</div></div>
+      <div class="step-line" id="line34"></div>
+      <div class="step-item"><div class="step-dot" id="dot4" onclick="tryGoStep(4)" title="Process">4</div></div>
+      <div class="step-line" id="line45"></div>
+      <div class="step-item"><div class="step-dot" id="dot5" onclick="tryGoStep(5)" title="Labeling">5</div></div>
+      <div class="step-line" id="line56"></div>
+      <div class="step-item"><div class="step-dot" id="dot6" onclick="tryGoStep(6)" title="Risk Branch">6</div></div>
+    </div>
+    <div class="page active" id="page0">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 0</span>
@@ -383,7 +394,7 @@
             <span class="rule-ref">NIB · UU 33/2014 · SiHalal registration</span> <span class="u-sihalal">SiHalal</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_1')">
+            <label class="upload-zone">
               <input type="file" id="f1_1" onchange="markUploaded('f1_1','ci1_1','s1_1')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_1">Not uploaded</span>
@@ -401,7 +412,7 @@
             <span class="rule-ref">Manual SJPH · facility ID &amp; matrix</span> <span class="u-sihalal">SiHalal</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_2')">
+            <label class="upload-zone">
               <input type="file" id="f1_2" onchange="markUploaded('f1_2','ci1_2','s1_2')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_2">Not uploaded</span>
@@ -419,7 +430,7 @@
             <span class="rule-ref">Layout Fasilitas Produksi · required doc</span> <span class="u-sihalal">SiHalal</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_3')">
+            <label class="upload-zone">
               <input type="file" id="f1_3" onchange="markUploaded('f1_3','ci1_3','s1_3')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_3">Not uploaded</span>
@@ -437,7 +448,7 @@
             <span class="rule-ref">Manual SJPH scope · incl. maklon</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_4')">
+            <label class="upload-zone">
               <input type="file" id="f1_4" onchange="markUploaded('f1_4','ci1_4','s1_4')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_4">Not uploaded</span>
@@ -457,7 +468,7 @@
             <span class="rule-ref">SJPH procedure · facility najis control</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_5')">
+            <label class="upload-zone">
               <input type="file" id="f1_5" onchange="markUploaded('f1_5','ci1_5','s1_5')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_5">Not uploaded</span>
@@ -475,7 +486,7 @@
             <span class="rule-ref">penyucian (ritual cleansing) · SJPH procedure</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_6')">
+            <label class="upload-zone">
               <input type="file" id="f1_6" onchange="markUploaded('f1_6','ci1_6','s1_6')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_6">Not uploaded</span>
@@ -493,7 +504,7 @@
             <span class="rule-ref">storage/transport procedure · SJPH · HAS 23000</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_7')">
+            <label class="upload-zone">
               <input type="file" id="f1_7" onchange="markUploaded('f1_7','ci1_7','s1_7')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_7">Not uploaded</span>
@@ -511,7 +522,7 @@
             <span class="rule-ref">Surat Penetapan Penyelia Halal · BNSP</span> <span class="u-sihalal">SiHalal</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
-            <label class="upload-zone" onclick="triggerUpload('f1_8')">
+            <label class="upload-zone">
               <input type="file" id="f1_8" onchange="markUploaded('f1_8','ci1_8','s1_8')" />
               <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_8">Not uploaded</span>
@@ -637,7 +648,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_1">!</div>
           <div class="check-label" style="flex:1;">Specification Sheets (all ingredients)</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_1')">
+          <label class="upload-zone">
             <input type="file" id="f3_1" multiple onchange="markUploaded('f3_1','ci3_1','s3_1')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_1">Not uploaded</span>
@@ -646,7 +657,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_2">!</div>
           <div class="check-label" style="flex:1;">Certificate of Analysis — COA</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_2')">
+          <label class="upload-zone">
             <input type="file" id="f3_2" multiple onchange="markUploaded('f3_2','ci3_2','s3_2')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_2">Not uploaded</span>
@@ -655,7 +666,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_3">!</div>
           <div class="check-label" style="flex:1;">MSDS / SDS</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_3')">
+          <label class="upload-zone">
             <input type="file" id="f3_3" multiple onchange="markUploaded('f3_3','ci3_3','s3_3')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_3">Not uploaded</span>
@@ -664,7 +675,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_4">!</div>
           <div class="check-label" style="flex:1;">Halal Certificates for ingredients (if available)</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_4')">
+          <label class="upload-zone">
             <input type="file" id="f3_4" multiple onchange="markUploaded('f3_4','ci3_4','s3_4')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_4">Not uploaded</span>
@@ -673,7 +684,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_5">!</div>
           <div class="check-label" style="flex:1;">Origin Declaration — Animal / Plant / Synthetic / Microbial</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_5')">
+          <label class="upload-zone">
             <input type="file" id="f3_5" multiple onchange="markUploaded('f3_5','ci3_5','s3_5')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_5">Not uploaded</span>
@@ -682,7 +693,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_6">!</div>
           <div class="check-label" style="flex:1;">Slaughter / Processing Method Certificate (animal-derived only)</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_6')">
+          <label class="upload-zone">
             <input type="file" id="f3_6" multiple onchange="markUploaded('f3_6','ci3_6','s3_6')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_6">Not uploaded</span>
@@ -691,7 +702,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_7">!</div>
           <div class="check-label" style="flex:1;">Fermentation Medium Declaration (fermented ingredients)</div>
-          <label class="upload-zone" onclick="triggerUpload('f3_7')">
+          <label class="upload-zone">
             <input type="file" id="f3_7" multiple onchange="markUploaded('f3_7','ci3_7','s3_7')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_7">Not uploaded</span>
@@ -720,7 +731,7 @@
             
             <span style="display:block;font-size:11px;color:var(--accent2);margin-top:2px;">✓ Required now — Until October 2026</span>
           </div>
-          <label class="upload-zone" onclick="triggerUpload('f3_8')">
+          <label class="upload-zone">
             <input type="file" id="f3_8" multiple onchange="markUploaded('f3_8','ci3_8','s3_8')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_8">Not uploaded</span>
@@ -743,7 +754,7 @@
             Packaging Material Specification Sheet
             
           </div>
-          <label class="upload-zone" onclick="triggerUpload('f3_9')">
+          <label class="upload-zone">
             <input type="file" id="f3_9" multiple onchange="markUploaded('f3_9','ci3_9','s3_9')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_9">Not uploaded</span>
@@ -764,7 +775,7 @@
             Cleaning Agent List (all agents used in production)
             
           </div>
-          <label class="upload-zone" onclick="triggerUpload('f3_10')">
+          <label class="upload-zone">
             <input type="file" id="f3_10" multiple onchange="markUploaded('f3_10','ci3_10','s3_10')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_10">Not uploaded</span>
@@ -777,7 +788,7 @@
             Halal Certificate or Origin Declaration for Cleaning Agents
             
           </div>
-          <label class="upload-zone" onclick="triggerUpload('f3_11')">
+          <label class="upload-zone">
             <input type="file" id="f3_11" multiple onchange="markUploaded('f3_11','ci3_11','s3_11')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_11">Not uploaded</span>
@@ -805,7 +816,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_1">!</div>
           <div class="check-label" style="flex:1;">Process Flow Diagram</div>
-          <label class="upload-zone" onclick="triggerUpload('f4_1')">
+          <label class="upload-zone">
             <input type="file" id="f4_1" onchange="markUploaded('f4_1','ci4_1','s4_1')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_1">Not uploaded</span>
@@ -814,7 +825,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_2">!</div>
           <div class="check-label" style="flex:1;">Equipment List</div>
-          <label class="upload-zone" onclick="triggerUpload('f4_2')">
+          <label class="upload-zone">
             <input type="file" id="f4_2" onchange="markUploaded('f4_2','ci4_2','s4_2')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_2">Not uploaded</span>
@@ -823,7 +834,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_3">!</div>
           <div class="check-label" style="flex:1;">Shared Equipment Product List</div>
-          <label class="upload-zone" onclick="triggerUpload('f4_3')">
+          <label class="upload-zone">
             <input type="file" id="f4_3" onchange="markUploaded('f4_3','ci4_3','s4_3')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_3">Not uploaded</span>
@@ -832,7 +843,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_4">!</div>
           <div class="check-label" style="flex:1;">Equipment Cleaning Procedure</div>
-          <label class="upload-zone" onclick="triggerUpload('f4_4')">
+          <label class="upload-zone">
             <input type="file" id="f4_4" onchange="markUploaded('f4_4','ci4_4','s4_4')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_4">Not uploaded</span>
@@ -844,7 +855,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_5">!</div>
           <div class="check-label" style="flex:1;">Cross-Contamination Prevention Plan<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Required if shared production line with non-halal products.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f4_5')">
+          <label class="upload-zone">
             <input type="file" id="f4_5" onchange="markUploaded('f4_5','ci4_5','s4_5')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_5">Not uploaded</span>
@@ -853,7 +864,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_7">!</div>
           <div class="check-label" style="flex:1;">Najis / Haram Material Handling Record<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Handling/segregation record for najis or haram materials, per SJPH SOP (SOP Penanganan Produk Tidak Sesuai).</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f4_7')">
+          <label class="upload-zone">
             <input type="file" id="f4_7" onchange="markUploaded('f4_7','ci4_7','s4_7')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_7">Not uploaded</span>
@@ -862,7 +873,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_8">!</div>
           <div class="check-label" style="flex:1;">Production Record / Batch Record Sample</div>
-          <label class="upload-zone" onclick="triggerUpload('f4_8')">
+          <label class="upload-zone">
             <input type="file" id="f4_8" onchange="markUploaded('f4_8','ci4_8','s4_8')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_8">Not uploaded</span>
@@ -878,11 +889,13 @@
   </div>
 
   <!--========== STEP 5: HAS/SJPH ==========-->
-  <div class="page" id="page5">
+  <div class="lib-overlay" id="libraryPanel" onclick="if(event.target===this)toggleLibrary()">
+      <div class="lib-modal">
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-step">STEP 5</span>
-        <span class="panel-title">SJPH Document Register</span>
+        <span class="panel-step lib-badge">REFERENCE</span>
+        <span class="panel-title">SJPH Document Library</span>
+            <button class="lib-close" onclick="toggleLibrary()" aria-label="Close">&times;</button>
       </div>
       <div class="panel-body">
         <div class="reg-summary">
@@ -945,20 +958,15 @@
         <div class="reg-crit"><span class="reg-crit-badge plus">+</span><span><span class="reg-crit-name">Informasi Tambahan</span><span class="reg-crit-kr">Additional Info (SiHalal)</span></span></div>
         <div class="reg-row"><span class="reg-name">PIC Name, Phone, Email, Digital Signature<span class="reg-id">Nama, HP, Email, TTD Digital PIC</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-info">Info</span></span></div>
         <div class="reg-row"><span class="reg-name">Supervisor Phone &amp; Digital Signature<span class="reg-id">HP &amp; TTD Digital Penyelia Halal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-info">Info</span></span></div>
-
-        <div class="btn-row">
-          <button class="btn btn-ghost" onclick="prevStep(5)">← Back</button>
-          <button class="btn btn-primary" onclick="nextStep(5)">Next: Labeling →</button>
         </div>
-      </div>
     </div>
   </div>
-
-  <!--========== STEP 6: Labeling ==========-->
-  <div class="page" id="page6">
+    </div>
+<!--========== STEP 6: Labeling ==========-->
+  <div class="page" id="page5">
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-step">STEP 6</span>
+        <span class="panel-step">STEP 5</span>
         <span class="panel-title">Label & Packaging</span>
       </div>
       <div class="panel-body">
@@ -967,7 +975,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_1">!</div>
           <div class="check-label" style="flex:1;">Label Draft / Artwork</div>
-          <label class="upload-zone" onclick="triggerUpload('f6_1')">
+          <label class="upload-zone">
             <input type="file" id="f6_1" onchange="markUploaded('f6_1','ci6_1','s6_1')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_1">Not uploaded</span>
@@ -976,7 +984,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_2">!</div>
           <div class="check-label" style="flex:1;">Ingredient Labeling on Package<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Must match submitted ingredient list exactly.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f6_2')">
+          <label class="upload-zone">
             <input type="file" id="f6_2" onchange="markUploaded('f6_2','ci6_2','s6_2')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_2">Not uploaded</span>
@@ -985,7 +993,7 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_3">!</div>
           <div class="check-label" style="flex:1;">Halal Logo Usage Plan</div>
-          <label class="upload-zone" onclick="triggerUpload('f6_3')">
+          <label class="upload-zone">
             <input type="file" id="f6_3" onchange="markUploaded('f6_3','ci6_3','s6_3')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_3">Not uploaded</span>
@@ -997,22 +1005,22 @@
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_5">!</div>
           <div class="check-label" style="flex:1;">Multilingual Label (Bahasa Indonesia required)<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">BPJPH requires Bahasa Indonesia on all labels for Indonesian market.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f6_5')">
+          <label class="upload-zone">
             <input type="file" id="f6_5" onchange="markUploaded('f6_5','ci6_5','s6_5')" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_5">Not uploaded</span>
           </label>
         </div>
         <div class="btn-row">
-          <button class="btn btn-ghost" onclick="prevStep(6)">← Back</button>
-          <button class="btn btn-primary" onclick="nextStep(6)">Generate Risk Branch Report →</button>
+          <button class="btn btn-ghost" onclick="prevStep(5)">← Back</button>
+          <button class="btn btn-primary" onclick="nextStep(5)">Generate Risk Branch Report →</button>
         </div>
       </div>
     </div>
   </div>
 
   <!--========== STEP 7: Final Risk Branch Report ==========-->
-  <div class="page" id="page7">
+  <div class="page" id="page6">
     <div id="finalReport"></div>
   </div>
 
@@ -1050,7 +1058,7 @@ function setRole(role) {
   const guidePanel = document.getElementById('consultantGuidePanel');
   if (guidePanel) guidePanel.style.display = (role === 'consultant' && analysisResults.length > 0) ? 'block' : 'none';
   if (analysisResults.length > 0) { renderIngredientResults(); renderConsultantGuide(); }
-  if (currentStep === 7) generateFinalReport();
+  if (currentStep === 6) generateFinalReport();
 }
 
 // ============================================================
@@ -1067,22 +1075,24 @@ function showPage(n) {
 }
 
 function updateProgress(active) {
-  for (let i=0;i<=7;i++) {
+  for (let i=0;i<=6;i++) {
     const d = document.getElementById('dot'+i);
     d.classList.remove('active','done','stop');
     if (i < active) d.classList.add('done');
     else if (i === active) d.classList.add('active');
-    if (i < 7) { const l = document.getElementById('line'+i+(i+1)); if(l) l.classList.toggle('done', i<active); }
+    if (i < 6) { const l = document.getElementById('line'+i+(i+1)); if(l) l.classList.toggle('done', i<active); }
   }
 }
 
 function nextStep(current) {
   if (current === 2 && analysisResults.length === 0) { alert('Please run the ingredient analysis first.'); return; }
-  if (current < 7) { showPage(current+1); if (current+1===7) generateFinalReport(); }
+  if (current < 6) { showPage(current+1); if (current+1===6) generateFinalReport(); }
 }
 function prevStep(current) { if (current > 0) showPage(current-1); }
 
-function jumpToFinalReport() { showPage(7); generateFinalReport(); }
+function jumpToFinalReport() { showPage(6); generateFinalReport(); }
+function toggleLibrary() { const o=document.getElementById('libraryPanel'); o.style.display=(o.style.display==='flex')?'none':'flex'; }
+document.addEventListener('keydown',function(e){ if(e.key==='Escape'){ const o=document.getElementById('libraryPanel'); if(o&&o.style.display==='flex') o.style.display='none'; } });
 
 // ============================================================
 // FILE UPLOAD
@@ -1750,12 +1760,18 @@ function matchIngredient(name) {
 function getRequiredDocs(result) {
   const t = result.tier || '';
   if (result.status === 'STOP')
-    return { docs_en:[], docs_kr:[], note_en:"Reformulation required — no documentation pathway.", note_kr:"성분 재구성 필요 — 서류 해결 경로 없음." };
+    return { options:[], note_en:"Reformulation required — no documentation pathway." };
   if (result.status === 'PASS')
-    return { docs_en:["Certificate of Analysis (CoA) — identity confirmation"], docs_kr:["CoA — 물질 신원 확인"], note_en:"Routine only — exempted under KMA 1360/2021, no halal certificate required.", note_kr:"통상 절차 — KMA 1360/2021 제외 물질, 할랄 인증서 불필요." };
+    return { options:[{label:'', docs:["Certificate of Analysis (CoA) — identity confirmation"]}],
+             note_en:"Routine only — exempted under KMA 1360/2021, no halal certificate required." };
   if (t.indexOf('출처의존') >= 0 || t.indexOf('범주') >= 0)
-    return { docs_en:["Source/origin declaration","Process documentation","Supplier CoA"], docs_kr:["출처/유래 선언서","공정 문서","공급사 CoA"], note_en:"Listed in KMA 1360/2021 but source/process-dependent — verify before PASS.", note_kr:"KMA 1360/2021 등재되었으나 출처·공정 의존 — PASS 전 검증 필요." };
-  return { docs_en:["Option A — Valid halal certificate","Option B — CoA + ingredient composition + process flowchart"], docs_kr:["옵션 A — 유효한 할랄 인증서","옵션 B — CoA + 전성분 구성표 + 제조 공정도"], note_en:"Not listed in KMA 1360/2021 — full evidence required.", note_kr:"KMA 1360/2021 미등재 — 전체 증빙 필요." };
+    return { options:[{label:'', docs:["Source / origin declaration","Process documentation","Supplier CoA"]}],
+             note_en:"Listed in KMA 1360/2021 but source/process-dependent — all three documents are required to verify." };
+  return { options:[
+      {label:'Option A — Valid halal certificate', docs:["Valid halal certificate (BPJPH or recognized halal body)"]},
+      {label:'Option B — Full document set', docs:["Certificate of Analysis (CoA)","Full ingredient composition breakdown","Manufacturing process flowchart"]}
+    ],
+    note_en:"Not listed in KMA 1360/2021 — provide EITHER a valid halal certificate (Option A) OR the complete Option B document set." };
 }
 
 function analyzeIngredients() {
@@ -1861,12 +1877,12 @@ function renderIngredientResults() {
     const showDetail = true;
 
     const layerBadge =
-      r.matchLayer === 1   ? `<span style="font-family:var(--mono);font-size:9px;color:var(--accent);background:rgba(110,231,183,0.06);border:1px solid rgba(110,231,183,0.15);padding:1px 5px;border-radius:3px;margin-left:6px;">RULE DB</span>` :
-      r.matchLayer === 1.5 ? `<span style="font-family:var(--mono);font-size:9px;color:#6D28D9;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);padding:1px 5px;border-radius:3px;margin-left:6px;">DECOMPOSED</span>` :
-      r.matchLayer === 2   ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;">PATTERN</span>` :
-      r.matchLayer === 3   ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;">KEYWORD</span>` :
-      r.matchLayer === 0.5 ? `<span style="font-family:var(--mono);font-size:9px;color:var(--accent);background:rgba(110,231,183,0.06);border:1px solid rgba(110,231,183,0.15);padding:1px 5px;border-radius:3px;margin-left:6px;">KMA 1360</span>` :
-      r.unclassified       ? `<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;">UNLISTED</span>` : '';
+      r.matchLayer === 1   ? `<span title="Exact match to an auditor-validated rule in the Rule DB — highest-confidence classification." style="font-family:var(--mono);font-size:9px;color:var(--accent);background:rgba(110,231,183,0.06);border:1px solid rgba(110,231,183,0.15);padding:1px 5px;border-radius:3px;margin-left:6px;cursor:help;">RULE DB</span>` :
+      r.matchLayer === 1.5 ? `<span title="Broken into component ingredients and evaluated from those (e.g. an ester into its acid + alcohol)." style="font-family:var(--mono);font-size:9px;color:#6D28D9;background:rgba(167,139,250,0.08);border:1px solid rgba(167,139,250,0.2);padding:1px 5px;border-radius:3px;margin-left:6px;cursor:help;">DECOMPOSED</span>` :
+      r.matchLayer === 2   ? `<span title="Matched by chemical-family pattern (e.g. the '-alcohol' family), not an exact entry." style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;cursor:help;">PATTERN</span>` :
+      r.matchLayer === 3   ? `<span title="Flagged by a risk-keyword heuristic — the least specific layer; worth a manual check." style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;cursor:help;">KEYWORD</span>` :
+      r.matchLayer === 0.5 ? `<span title="Found on the KMA 1360/2021 government positive list of exempt materials — authoritative lookup." style="font-family:var(--mono);font-size:9px;color:var(--accent);background:rgba(110,231,183,0.06);border:1px solid rgba(110,231,183,0.15);padding:1px 5px;border-radius:3px;margin-left:6px;cursor:help;">KMA 1360</span>` :
+      r.unclassified       ? `<span title="Not found in any rule layer or the KMA 1360 list — conservatively held for full evidence. The engine does not guess." style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;margin-left:6px;cursor:help;">UNLISTED</span>` : '';
 
     const decomposedInfo = r.matchLayer === 1.5 && r.decomposedFrom
       ? `<div style="font-size:11px;color:#6D28D9;margin-top:4px;font-family:var(--mono);">⟶ ${r.decomposedFrom.join(' + ')}</div>`
@@ -1889,14 +1905,12 @@ function renderIngredientResults() {
 
     // 성분별 required docs 자동 생성
     const reqDocs = isConsultant ? getRequiredDocs(r) : null;
-    const reqDocsHtml = reqDocs && reqDocs.docs_en.length > 0 ? `
+    const reqDocsHtml = (reqDocs && reqDocs.options && reqDocs.options.length > 0) ? `
       <div style="margin-top:8px;padding:8px 12px;background:rgba(234,179,8,0.04);border:1px solid rgba(234,179,8,0.15);border-radius:4px;">
- <div style="font-size:10px;color:var(--yellow);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.06em;">REQUIRED DOCUMENTS </div>
-        ${reqDocs.docs_en.map((doc,i) => `
-          <div style="font-size:11px;color:var(--text2);margin-bottom:3px;">
-            <span style="color:var(--text3);margin-right:6px;">▸</span>${doc}
-            <span style="color:var(--text3);display:block;margin-left:14px;font-size:10px;">${reqDocs.docs_kr[i]||''}</span>
-          </div>`).join('')}
+        <div style="font-size:10px;color:var(--yellow);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.06em;">REQUIRED DOCUMENTS${reqDocs.options.length>1?' · EITHER OPTION':''}</div>
+        ${reqDocs.options.map((opt,oi) => `
+          ${opt.label ? `${oi>0?`<div style="font-size:10px;color:var(--text3);font-family:var(--mono);margin:6px 0 2px;letter-spacing:0.1em;">— OR —</div>`:''}<div style="font-size:11px;color:var(--text);font-weight:600;margin-bottom:2px;">${opt.label}${opt.docs.length>1?` <span style="font-weight:400;color:var(--text3);">(all ${opt.docs.length} required)</span>`:''}</div>` : ''}
+          ${opt.docs.map(doc => `<div style="font-size:11px;color:var(--text2);margin-bottom:3px;margin-left:${opt.label?'12px':'0'};"><span style="color:var(--text3);margin-right:6px;">▸</span>${doc}</div>`).join('')}`).join('')}
         ${reqDocs.note_en ? `<div style="margin-top:6px;font-size:11px;color:var(--text3);font-style:italic;">${reqDocs.note_en}</div>` : ''}
       </div>` : '';
 
@@ -1944,8 +1958,8 @@ function renderConsultantGuide() {
         <span class="badge ${r.status==='STOP'?'badge-stop':'badge-hold'}">${r.status}</span>
         <span style="font-family:var(--mono);font-size:12px;">${r.canonical||r.input}</span>
         ${r.rule_ref?`<span class="rule-ref">${r.rule_ref}</span>`:''}
-        ${r.matchLayer===2?`<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;">PATTERN</span>`:''}
-        ${r.matchLayer===3?`<span style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;">KEYWORD</span>`:''}
+        ${r.matchLayer===2?`<span title="Matched by chemical-family pattern (e.g. the '-alcohol' family), not an exact entry." style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;cursor:help;">PATTERN</span>`:''}
+        ${r.matchLayer===3?`<span title="Flagged by a risk-keyword heuristic — the least specific layer; worth a manual check." style="font-family:var(--mono);font-size:9px;color:var(--text3);background:var(--surface2);border:1px solid var(--border2);padding:1px 5px;border-radius:3px;cursor:help;">KEYWORD</span>`:''}
       </div>
       ${r.reason_en?`
         <div class="guide-box">
@@ -1970,33 +1984,43 @@ function populateStep3Issues() {
   const cards = issues.map((r, idx) => {
     const isStop = r.status==='STOP';
     const rd = getRequiredDocs(r);
-    const docs_en = rd.docs_en || [];
-    const docs_kr = rd.docs_kr || [];
-    const fileIds = [];
-    const slots = docs_en.map((doc, j) => {
-      const fid = `ing${idx}_${j}`;
-      fileIds.push(fid);
-      return `
+    const options = rd.options || [];
+    const optGroups = [];
+    let slotIdx = 0;
+    let slotsHtml = '';
+    options.forEach((opt, oi) => {
+      const optFileIds = [];
+      const rows = opt.docs.map(doc => {
+        const fid = `ing${idx}_${slotIdx++}`;
+        optFileIds.push(fid);
+        return `
         <div class="checklist-item" style="margin-top:8px;">
           <div class="check-icon check-add" id="ci_${fid}">!</div>
           <div class="check-label" style="flex:1;">${doc}</div>
-          <label class="upload-zone" onclick="triggerUpload('${fid}')">
+          <label class="upload-zone">
             <input type="file" id="${fid}" multiple onchange="markIngredientDoc('${fid}','ci_${fid}','s_${fid}',${idx})" />
             <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s_${fid}">Not uploaded</span>
           </label>
         </div>`;
-    }).join('');
-    step3IngredientDocs.push({ idx, fileIds, isStop });
+      }).join('');
+      optGroups.push({ label: opt.label, fileIds: optFileIds });
+      const header = opt.label
+        ? `${oi>0?`<div style="text-align:center;font-family:var(--mono);font-size:10px;color:var(--text3);margin:12px 0 2px;letter-spacing:0.12em;">— OR —</div>`:''}<div style="font-size:12px;color:var(--text);font-weight:600;margin-top:8px;">${opt.label}${opt.docs.length>1?` <span style="font-weight:400;color:var(--text3);font-size:10px;">(all ${opt.docs.length} required)</span>`:''}</div>`
+        : '';
+      slotsHtml += header + rows;
+    });
+    step3IngredientDocs.push({ idx, isStop, options: optGroups });
     const pill = isStop
- ? `<span class="badge badge-stop" id="ingpill_${idx}" style="flex-shrink:0;">Reformulate</span>`
- : `<span class="badge badge-hold" id="ingpill_${idx}" style="flex-shrink:0;">Missing</span>`;
+      ? `<span class="badge badge-stop" id="ingpill_${idx}" style="flex-shrink:0;">Reformulate</span>`
+      : `<span class="badge badge-hold" id="ingpill_${idx}" style="flex-shrink:0;">Missing</span>`;
     const supplier = r.supplier ? `<div style="font-size:11px;color:var(--text2);margin-top:3px;"><span style="font-family:var(--mono);font-size:10px;color:var(--text3);">SUPPLIER</span> ${r.supplier}</div>` : '';
+    const evidenceHint = options.length>1 ? '&middot; provide either option' : ((options[0]&&options[0].docs.length>1) ? '&middot; all required' : '');
     const body = isStop
-      ? `<div style="margin-top:10px;font-size:11px;color:var(--red);">${rd.note_en||''}<br><span style="color:var(--text3);">${rd.note_kr||''}</span></div>`
- : `<div style="margin-top:10px;font-size:10px;color:var(--yellow);font-family:var(--mono);letter-spacing:0.06em;">REQUIRED EVIDENCE</div>
-         ${slots}
-         ${rd.note_en?`<div style="margin-top:8px;font-size:11px;color:var(--text3);font-style:italic;">${rd.note_en} <span style="color:var(--text3);">${rd.note_kr||''}</span></div>`:''}`;
+      ? `<div style="margin-top:10px;font-size:11px;color:var(--red);">${rd.note_en||''}</div>`
+      : `<div style="margin-top:10px;font-size:10px;color:var(--yellow);font-family:var(--mono);letter-spacing:0.06em;">REQUIRED EVIDENCE ${evidenceHint}</div>
+         ${slotsHtml}
+         ${rd.note_en?`<div style="margin-top:10px;font-size:11px;color:var(--text3);font-style:italic;">${rd.note_en}</div>`:''}`;
     return `
       <div class="ingredient-card" style="border:1px solid var(--border);border-radius:8px;padding:14px 16px;margin-bottom:14px;background:var(--surface);">
         <div style="display:flex;align-items:flex-start;gap:10px;">
@@ -2005,7 +2029,6 @@ function populateStep3Issues() {
             ${supplier}
             <div class="ing-detail" style="margin-top:4px;">
               <div>${r.reason_en||'—'}</div>
-              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en||''}</div>
               <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
             </div>
           </div>
@@ -2015,8 +2038,8 @@ function populateStep3Issues() {
       </div>`;
   }).join('');
   div.innerHTML = `
- <div class="section-title">Flagged Ingredients from Step 2 — Per-Ingredient Evidence<br><span style="font-family:var(--sans);letter-spacing:0;">Step 2— </span></div>
- <p style="font-size:12px;color:var(--text2);margin:6px 0 14px;">Upload the evidence each ingredient needs in its own card below. Each ingredient shows its status (Missing / Partial / Complete).<br></p>
+    <div class="section-title">Flagged Ingredients from Step 2 — Per-Ingredient Evidence</div>
+    <p style="font-size:12px;color:var(--text2);margin:6px 0 14px;">Upload the evidence each ingredient needs in its own card below. Each ingredient shows its status (Missing / Partial / Complete).</p>
     ${cards}`;
 }
 
@@ -2030,16 +2053,13 @@ function recomputeIngredientStatus(idx) {
   if (!entry || entry.isStop) return;
   const pill = document.getElementById('ingpill_'+idx);
   if (!pill) return;
-  const total = entry.fileIds.length;
-  const done = entry.fileIds.filter(fid=>uploadedFiles[fid]).length;
- if (done===0) { pill.className='badge badge-hold'; pill.textContent='Missing'; }
-  else if (done<total) { pill.className='badge badge-hold'; pill.textContent='추가 필요 / Partial'; }
-  else { pill.className='badge badge-ok'; pill.textContent='충족 / Complete'; }
+  const opts = entry.options || [];
+  const anyComplete = opts.some(o => o.fileIds.length>0 && o.fileIds.every(fid=>uploadedFiles[fid]));
+  const anyUploaded = opts.some(o => o.fileIds.some(fid=>uploadedFiles[fid]));
+  if (anyComplete) { pill.className='badge badge-ok'; pill.textContent='Complete'; }
+  else if (anyUploaded) { pill.className='badge badge-hold'; pill.textContent='Partial'; }
+  else { pill.className='badge badge-hold'; pill.textContent='Missing'; }
 }
-
-// ============================================================
-// FINAL REPORT (STEP 7)
-// ============================================================
 
 function actionRow(n, tag, color, title, detail, ref){
   return `<div class="reg-row" style="align-items:flex-start;">
@@ -2054,18 +2074,68 @@ function actionRow(n, tag, color, title, detail, ref){
   </div>`;
 }
 
-function buildActionPlan(stopItems, holdItems, docIssues){
-  const nStop=stopItems.length, nHold=holdItems.length, nDoc=docIssues.length;
-  const total=nStop+nHold+nDoc;
+function collectAllDocuments(){
+  const out=[];
+  document.querySelectorAll('.checklist-item input[type=file]').forEach(inp=>{
+    if(!/^f\d_\d$/.test(inp.id)) return;
+    const item=inp.closest('.checklist-item');
+    const lblEl=item?item.querySelector('.check-label'):null;
+    let label=inp.id;
+    if(lblEl){ const t=lblEl.childNodes[0]; label=((t&&t.textContent)?t.textContent:lblEl.textContent).trim(); }
+    const page=inp.closest('.page');
+    const step=page?('Step '+page.id.replace('page','')):'';
+    out.push({id:inp.id,label:label,step:step,uploaded:!!uploadedFiles[inp.id],filename:uploadedFiles[inp.id]||''});
+  });
+  return out;
+}
+
+function readyRow(mark,color,label,sub,badgeCls,badgeTxt){
+  return `<div class="reg-row"><span class="reg-name" style="color:${color};">${mark}&nbsp;&nbsp;${label}<span class="reg-id">${sub}</span></span><span class="badge ${badgeCls}">${badgeTxt}</span></div>`;
+}
+
+function buildReadiness(docs){
+  const up=docs.filter(d=>d.uploaded), miss=docs.filter(d=>!d.uploaded), total=docs.length;
+  let body='';
+  if(miss.length){
+    body+=`<div style="font-size:11px;color:var(--red);font-weight:600;margin:12px 0 4px;letter-spacing:0.04em;">MISSING &mdash; collect before submission</div>`;
+    body+=miss.map(d=>readyRow('&#10007;','var(--text)',d.label,d.step,'badge-stop','Missing')).join('');
+  }
+  if(up.length){
+    body+=`<div style="font-size:11px;color:var(--text3);margin:16px 0 4px;letter-spacing:0.04em;">UPLOADED</div>`;
+    body+=up.map(d=>readyRow('&#10003;','var(--text2)',d.label,d.step+(d.filename?(' &middot; '+d.filename):''),'badge-pass','Uploaded')).join('');
+  }
+  return `<div class="section-title">Submission Readiness</div>
+    <div class="reg-summary" style="margin-bottom:4px;">
+      <div><span class="rs-num" style="color:var(--green)">${up.length}</span> <span class="rs-lab">of ${total} uploaded</span></div>
+      <div><span class="rs-num" style="color:${miss.length?'var(--red)':'var(--green)'}">${miss.length}</span> <span class="rs-lab">missing</span></div>
+      <div class="rs-lab" style="margin-left:auto">document presence only &mdash; content not verified</div>
+    </div>
+    ${body}
+    <hr>`;
+}
+
+function isIngredientResolved(r){
+  const issues = analysisResults.filter(x=>x.status==='STOP'||x.status==='HOLD');
+  const entry = (typeof step3IngredientDocs!=='undefined') ? step3IngredientDocs.find(e=>e.idx===issues.indexOf(r)) : null;
+  if(!entry || entry.isStop) return false;
+  const opts = entry.options||[];
+  return opts.some(o=>o.fileIds.length>0 && o.fileIds.every(fid=>uploadedFiles[fid]));
+}
+
+function buildActionPlan(stopItems, holdItems, resolvedHolds){
+  const nStop=stopItems.length, nHold=holdItems.length, nResolved=(resolvedHolds||[]).length;
+  const total=nStop+nHold;
   if(total===0){
+    const note = nResolved>0
+      ? `Evidence uploaded for ${nResolved} flagged ingredient${nResolved>1?'s':''} — no open ingredient actions remain.`
+      : 'All ingredients cleared — no reformulation or ingredient documentation required.';
     return `<div class="section-title">Consultant Action Plan</div>
       <div class="reg-summary" style="border-left-color:var(--green);margin-bottom:8px;">
         <div><span class="rs-num" style="color:var(--green)">0</span> <span class="rs-lab">open actions</span></div>
-        <div class="rs-lab">All ingredients cleared and required documents complete — ready for certification review.</div>
+        <div class="rs-lab">${note}</div>
       </div>`;
   }
   let rows='', n=1;
-  // fixed, rule-derived order: STOP (reformulate) -> HOLD (documentation) -> checklist gaps
   stopItems.forEach(r=>{
     rows += actionRow(n++, 'REFORMULATE', 'var(--red)',
       `Replace or remove <b>${r.input||r.canonical||'ingredient'}</b>`,
@@ -2073,29 +2143,28 @@ function buildActionPlan(stopItems, holdItems, docIssues){
       r.rule_ref);
   });
   holdItems.forEach(r=>{
-    const path = (r.guide_en && r.guide_en.trim())
-      ? r.guide_en
-      : 'Resolution path not defined in Rule DB — route to consultant for manual review.';
+    const rd = getRequiredDocs(r);
+    const path = (rd && rd.note_en) ? rd.note_en
+      : (r.guide_en && r.guide_en.trim() ? r.guide_en : 'Route to consultant for manual review.');
     rows += actionRow(n++, 'DOCUMENTATION', 'var(--yellow)',
-      `Obtain evidence for <b>${r.input||r.canonical||'ingredient'}</b>`,
-      path, r.rule_ref);
+      `Obtain evidence for <b>${r.input||r.canonical||'ingredient'}</b>`, path, r.rule_ref);
   });
-  docIssues.forEach(d=>{
-    rows += actionRow(n++, 'DOCUMENT', 'var(--accent2)',
-      `Upload: <b>${d.label}</b>`, d.step||'', null);
-  });
+  const resolvedBlock = nResolved>0 ? `
+    <div style="font-size:11px;color:var(--text3);margin:16px 0 4px;letter-spacing:0.04em;">RESOLVED &mdash; evidence uploaded</div>
+    ${resolvedHolds.map(r=>`<div class="reg-row"><span class="reg-name" style="color:var(--text2);">&#10003;&nbsp;&nbsp;Evidence obtained for <b>${r.input||r.canonical}</b></span><span class="badge badge-pass">Resolved</span></div>`).join('')}` : '';
   return `<div class="section-title">Consultant Action Plan</div>
     <div class="reg-summary" style="margin-bottom:12px;">
-      <div><span class="rs-num">${total}</span> <span class="rs-lab">ordered actions</span></div>
+      <div><span class="rs-num">${total}</span> <span class="rs-lab">open actions</span></div>
       <div><span class="rs-num" style="color:var(--red)">${nStop}</span> <span class="rs-lab">reformulate</span></div>
       <div><span class="rs-num" style="color:var(--yellow)">${nHold}</span> <span class="rs-lab">documentation</span></div>
-      <div><span class="rs-num" style="color:var(--accent2)">${nDoc}</span> <span class="rs-lab">document gaps</span></div>
-      <div class="rs-lab" style="margin-left:auto">order: reformulate &rarr; documentation &rarr; gaps</div>
+      ${nResolved>0?`<div><span class="rs-num" style="color:var(--green)">${nResolved}</span> <span class="rs-lab">resolved</span></div>`:''}
+      <div class="rs-lab" style="margin-left:auto">order: reformulate &rarr; documentation</div>
     </div>
     <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6;">
-      Compiled from the Rule Engine output. Ordering and content are rule-derived &mdash; the AI adds no judgment; each action carries its regulatory basis.
+      Compiled from the Rule Engine output and your uploaded evidence &mdash; ordering and content are rule-derived; the AI adds no judgment.
     </div>
     ${rows}
+    ${resolvedBlock}
     <hr>`;
 }
 
@@ -2113,10 +2182,13 @@ function generateFinalReport() {
 
   const stopItems = analysisResults.filter(r=>r.status==='STOP');
   const holdItems = analysisResults.filter(r=>r.status==='HOLD');
+  const resolvedHolds = holdItems.filter(isIngredientResolved);
+  const pendingHolds = holdItems.filter(function(r){return !isIngredientResolved(r);});
   const passItems = analysisResults.filter(r=>r.status==='PASS');
 
   // Checklist issues from steps 1-6
   const docIssues = collectDocumentIssues();
+  const allDocs = collectAllDocuments();
 
   const cfgs = {
     STOP:{ cls:'result-stop', icon:'🛑', title_en:'STOP — Certification Not Processable', title_kr:'진행 불가 — 인증 진행 불가' },
@@ -2132,7 +2204,7 @@ function generateFinalReport() {
     </div>
     <div class="panel">
       <div class="panel-header">
-        <span class="panel-step">STEP 7</span>
+        <span class="panel-step">STEP 6</span>
  <span class="panel-title">Risk Branch Report <span class="panel-title-kr"></span></span>
       </div>
       <div class="panel-body">
@@ -2142,7 +2214,8 @@ function generateFinalReport() {
           <div class="result-title">${sc.title_en}</div>
         </div>
 
- ${buildActionPlan(stopItems, holdItems, docIssues)}
+ ${buildReadiness(allDocs)}
+        ${buildActionPlan(stopItems, pendingHolds, resolvedHolds)}
 
         <div class="section-title">Case Information</div>
         <div class="info-row"><span class="info-key">BRAND</span><span>${brand}</span></div>
@@ -2174,19 +2247,21 @@ function generateFinalReport() {
 
         ${holdItems.length>0 ? `
  <div class="section-title" style="color:var(--yellow);">⏸ Conditional Ingredients — Documentation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);">— </span></div>
-          ${holdItems.map(r=>`
+          ${holdItems.map(r=>{
+              const resolved = isIngredientResolved(r);
+              const rd = getRequiredDocs(r);
+              return `
             <div class="ingredient-row">
               <div style="flex:1;">
                 <div class="ing-name">${r.canonical||r.input}</div>
                 <div class="ing-detail">
                   <div>${r.reason_en||'—'}</div>
-                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en||''}</div>
                   <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
- ${isConsultant?`<div class="guide-box" style="margin-top:8px;"><div class="guide-title">REQUIRED DOCUMENTS </div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_en||r.reason_en}</div></div>`:''}
+                  ${isConsultant?`<div class="guide-box" style="margin-top:8px;"><div class="guide-title">REQUIRED DOCUMENTS</div><div>${rd.note_en||r.reason_en||''}</div></div>`:''}
                 </div>
               </div>
-              <span class="badge badge-hold" style="flex-shrink:0;margin-top:2px;">HOLD</span>
-            </div>`).join('')}
+              <span class="badge ${resolved?'badge-pass':'badge-hold'}" style="flex-shrink:0;margin-top:2px;">${resolved?'Resolved':'HOLD'}</span>
+            </div>`;}).join('')}
         ` : ''}
 
         ${passItems.length>0 ? `
@@ -2205,17 +2280,9 @@ function generateFinalReport() {
             </div>`).join('')}
         ` : ''}
 
-        ${docIssues.length>0 ? `
- <div class="section-title" style="color:var(--yellow);">📄 Document Checklist Issues — Submission Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);"></span></div>
-          ${docIssues.map(d=>`
-            <div class="checklist-item">
-              <div class="check-icon check-no">✕</div>
-              <div class="check-label" style="flex:1;">${d.label}<span class="check-label-kr">${d.step}</span></div>
-              <span class="badge badge-hold">MISSING</span>
-            </div>`).join('')}
-        ` : ''}
+        
 
-        ${overallStatus==='PASS'&&docIssues.length===0 ? `
+        ${overallStatus==='PASS'&&allDocs.every(function(d){return d.uploaded;}) ? `
           <div style="color:var(--green);font-size:13px;padding:16px 0;">
             ✓ All ingredients cleared and documents submitted. Ready to proceed.<br>
  
@@ -2223,20 +2290,20 @@ function generateFinalReport() {
 
         ${!isConsultant ? `
           <div id="handoffBox" style="margin-top:24px;border:1px solid var(--accent);border-radius:8px;padding:16px 18px;background:rgba(110,231,183,0.04);">
- <div class="section-title" style="margin-top:0;">Hand off to a Consulting Firm — Request Analysis<br><span style="font-family:var(--sans);letter-spacing:0;"></span></div>
- <p style="font-size:12px;color:var(--text2);margin:6px 0 12px;">You've uploaded all the documents you have. Send this case — with your uploads and analysis results — to a PreHalal partner consulting firm for full review and SiHalal submission prep.<br><span style="color:var(--text3);">. PreHalal SiHalal .</span></p>
+ <div class="section-title" style="margin-top:0;">Hand off to a Consulting Firm — Request Analysis</div>
+ <p style="font-size:12px;color:var(--text2);margin:6px 0 12px;">You've uploaded all the documents you have. Send this case — with your uploads and analysis results — to a PreHalal partner consulting firm for full review and SiHalal submission prep.</p>
             <div style="display:flex;flex-direction:column;gap:8px;">
               <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="HalalEase Consulting" style="width:16px;height:16px;"> HalalEase Consulting</label>
               <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="Amanah Halal Consulting" style="width:16px;height:16px;"> Amanah Halal Consulting</label>
               <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="Nusantara Halal Partners" style="width:16px;height:16px;"> Nusantara Halal Partners</label>
             </div>
- <div style="font-size:10px;color:var(--text3);margin-top:8px;">* — PreHalalsample partners, multiple selection allowed</div>
+ <div style="font-size:10px;color:var(--text3);margin-top:8px;">* — sample partners (demo) · multiple selection allowed</div>
  <button class="btn btn-primary" style="margin-top:14px;" onclick="submitConsultingRequest">Send & Request →</button>
           </div>
         ` : ''}
 
         <div class="btn-row" style="margin-top:24px;">
-          <button class="btn btn-ghost" onclick="prevStep(7)">← Back</button>
+          <button class="btn btn-ghost" onclick="prevStep(6)">← Back</button>
  <button class="btn btn-ghost" onclick="resetAll">↺ New Case </button>
         </div>
       </div>
@@ -2266,7 +2333,7 @@ function collectDocumentIssues() {
     { id:'f3_1', label:'Specification Sheets', step:'Step 3' },
     { id:'f3_5', label:'Origin Declaration', step:'Step 3' },
     { id:'f4_1', label:'Process Flow Diagram', step:'Step 4' },
-    { id:'f6_1', label:'Label Draft', step:'Step 6' },
+    { id:'f6_1', label:'Label Draft', step:'Step 5' },
   ];
   return checks.filter(c => !uploadedFiles[c.id]);
 }
