@@ -182,7 +182,63 @@
     .field-row, .field-row3 { grid-template-columns: 1fr; }
     header { padding: 0 16px; }
   }
-</style>
+  /* ===== SJPH document register (Step 5) + usage tags ===== */
+  .u-sihalal, .u-audit { display:inline-flex; align-items:center; font-family:var(--mono); font-size:10px; font-weight:600; padding:2px 8px; border-radius:999px; letter-spacing:0.02em; white-space:nowrap; }
+  .u-sihalal { background:rgba(6,53,79,0.08); color:var(--accent2); border:1px solid rgba(6,53,79,0.22); }
+  .u-audit { background:rgba(180,83,9,0.09); color:var(--yellow); border:1px solid rgba(180,83,9,0.24); }
+  .u-mini { padding:1px 6px; font-size:9px; }
+  .t-template, .t-evidence, .t-sop, .t-info { display:inline-flex; align-items:center; font-family:var(--sans); font-size:10px; font-weight:500; padding:2px 8px; border-radius:5px; white-space:nowrap; background:var(--surface2); color:var(--text2); border:1px solid var(--border2); }
+  .t-sop { border-style:dashed; }
+
+  .reg-summary { display:flex; flex-wrap:wrap; align-items:center; gap:14px; background:rgba(6,53,79,0.03); border:1px solid var(--border); border-left:3px solid var(--accent); border-radius:8px; padding:12px 16px; margin-bottom:8px; }
+  .reg-summary .rs-num { font-family:var(--mono); font-weight:600; color:var(--accent2); font-size:15px; }
+  .reg-summary .rs-lab { font-size:11px; color:var(--text3); font-family:var(--mono); }
+  .reg-legend { display:flex; flex-wrap:wrap; gap:10px; margin-bottom:18px; font-size:11px; color:var(--text3); }
+
+  .reg-crit { display:flex; align-items:center; gap:10px; margin:26px 0 12px; padding-bottom:8px; border-bottom:1px solid var(--border); }
+  .reg-crit:first-of-type { margin-top:8px; }
+  .reg-crit-badge { width:24px; height:24px; border-radius:6px; background:var(--accent2); color:#fff; font-family:var(--mono); font-size:12px; font-weight:600; display:flex; align-items:center; justify-content:center; flex-shrink:0; }
+  .reg-crit-badge.plus { background:var(--surface2); color:var(--accent); border:1px solid var(--accent); }
+  .reg-crit-name { font-size:14px; font-weight:600; color:var(--text); }
+  .reg-crit-kr { font-size:12px; color:var(--text3); font-weight:400; margin-left:4px; }
+
+  .reg-sub { display:flex; align-items:baseline; gap:8px; margin:14px 0 6px; padding-left:2px; }
+  .reg-sub-name { font-size:12px; font-weight:600; color:var(--text2); }
+  .reg-sub-id { font-size:10px; color:var(--text3); font-family:var(--mono); }
+  .reg-sub-count { font-size:10px; color:#fff; background:var(--text3); border-radius:999px; padding:1px 7px; font-family:var(--mono); }
+
+  .reg-row { display:flex; align-items:center; justify-content:space-between; gap:12px; padding:9px 12px; border:1px solid var(--border); border-radius:7px; margin-bottom:6px; background:var(--surface); }
+  .reg-row:hover { border-color:var(--border2); }
+  .reg-name { font-size:13px; color:var(--text); font-weight:500; line-height:1.4; }
+  .reg-id { display:block; font-size:10px; color:var(--text3); font-family:var(--mono); font-weight:400; margin-top:1px; }
+  .reg-tags { display:flex; align-items:center; gap:6px; flex-shrink:0; }
+
+  .reg-grid { display:grid; grid-template-columns:1fr 1fr; gap:6px; margin-bottom:6px; }
+  .reg-chip { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:7px 10px; border:1px solid var(--border); border-radius:6px; background:var(--surface); }
+  .reg-chip-name { font-size:12px; color:var(--text2); line-height:1.3; }
+
+  @media (max-width: 600px) { .reg-grid { grid-template-columns:1fr; } .reg-row { flex-direction:column; align-items:flex-start; } }
+
+
+    /* ---- print / save-as-PDF ---- */
+    .print-btn{display:inline-flex;align-items:center;gap:6px;padding:8px 15px;border-radius:6px;
+      background:#06354F;color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;
+      font-family:var(--sans);letter-spacing:0.01em;transition:opacity .15s;}
+    .print-btn:hover{opacity:.88;}
+    .print-btn:before{content:"";}
+    @media print{
+      @page{margin:12mm;}
+      html,body{background:#fff !important;}
+      header,.progress-bar,.btn-row,.print-hide{display:none !important;}
+      .page{display:none !important;}
+      #page7{display:block !important;}
+      .container{max-width:none !important;margin:0 !important;padding:0 !important;}
+      .panel{box-shadow:none !important;}
+      *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important;}
+      .reg-row,.info-row,.result-summary,.guide-box,.checklist-item{break-inside:avoid;}
+      .section-title{break-after:avoid;}
+    }
+  </style>
 </head>
 <body class="manufacturer">
 
@@ -191,73 +247,73 @@
   <div style="display:flex;align-items:center;gap:12px;">
     <span class="role-label">VIEW MODE</span>
     <div class="role-toggle">
-      <button class="role-btn active" onclick="setRole('manufacturer')">Manufacturer<br><span style="font-size:10px;opacity:0.6">제조사</span></button>
-      <button class="role-btn" onclick="setRole('consultant')">Consultant<br><span style="font-size:10px;opacity:0.6">컨설팅사</span></button>
+      <button class="role-btn active" onclick="setRole('manufacturer')">Manufacturer</button>
+      <button class="role-btn" onclick="setRole('consultant')">Consultant</button>
     </div>
   </div>
 </header>
 
 <div class="container">
-  <!-- PROGRESS BAR -->
+  <!--PROGRESS BAR-->
   <div class="progress-bar" id="progressBar">
-    <div class="step-item"><div class="step-dot active" id="dot0" onclick="tryGoStep(0)" title="Product Registration / 제품 등록">0</div></div>
+    <div class="step-item"><div class="step-dot active" id="dot0" onclick="tryGoStep(0)" title="Product Registration">0</div></div>
     <div class="step-line" id="line01"></div>
-    <div class="step-item"><div class="step-dot" id="dot1" onclick="tryGoStep(1)" title="Company Info / 기업·공장 정보">1</div></div>
+    <div class="step-item"><div class="step-dot" id="dot1" onclick="tryGoStep(1)" title="Company Info">1</div></div>
     <div class="step-line" id="line12"></div>
-    <div class="step-item"><div class="step-dot" id="dot2" onclick="tryGoStep(2)" title="Ingredients / 전성분">2</div></div>
+    <div class="step-item"><div class="step-dot" id="dot2" onclick="tryGoStep(2)" title="Ingredients">2</div></div>
     <div class="step-line" id="line23"></div>
-    <div class="step-item"><div class="step-dot" id="dot3" onclick="tryGoStep(3)" title="Raw Materials / 원료 증빙">3</div></div>
+    <div class="step-item"><div class="step-dot" id="dot3" onclick="tryGoStep(3)" title="Raw Materials">3</div></div>
     <div class="step-line" id="line34"></div>
-    <div class="step-item"><div class="step-dot" id="dot4" onclick="tryGoStep(4)" title="Process / 제조 공정">4</div></div>
+    <div class="step-item"><div class="step-dot" id="dot4" onclick="tryGoStep(4)" title="Process">4</div></div>
     <div class="step-line" id="line45"></div>
     <div class="step-item"><div class="step-dot" id="dot5" onclick="tryGoStep(5)" title="HAS/SJPH">5</div></div>
     <div class="step-line" id="line56"></div>
-    <div class="step-item"><div class="step-dot" id="dot6" onclick="tryGoStep(6)" title="Labeling / 라벨">6</div></div>
+    <div class="step-item"><div class="step-dot" id="dot6" onclick="tryGoStep(6)" title="Labeling">6</div></div>
     <div class="step-line" id="line67"></div>
-    <div class="step-item"><div class="step-dot" id="dot7" onclick="tryGoStep(7)" title="Risk Branch / 리스크 분기">7</div></div>
+    <div class="step-item"><div class="step-dot" id="dot7" onclick="tryGoStep(7)" title="Risk Branch">7</div></div>
   </div>
 
-  <!-- ========== STEP 0: Product Registration ========== -->
+  <!--========== STEP 0: Product Registration ==========-->
   <div class="page active" id="page0">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 0</span>
-        <span class="panel-title">Product Registration <span class="panel-title-kr">제품 등록</span></span>
+        <span class="panel-title">Product Registration</span>
       </div>
       <div class="panel-body">
-        <div class="section-title">Brand & Product Info 브랜드·제품 정보</div>
+        <div class="section-title">Brand & Product Info</div>
         <div class="field-row">
           <div class="field">
-            <label>Brand Name <span class="kr">/ 브랜드명 *</span></label>
+            <label>Brand Name <span class="kr">*</span></label>
             <input type="text" id="brandName" placeholder="e.g. AmorePacific" />
           </div>
           <div class="field">
-            <label>Product Name <span class="kr">/ 제품명 *</span></label>
+            <label>Product Name <span class="kr">*</span></label>
             <input type="text" id="productName" placeholder="e.g. Radiance Facial Cream" />
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Product Type <span class="kr">/ 제품 유형 *</span></label>
+            <label>Product Type <span class="kr">*</span></label>
             <select id="productType">
               <option value="">Select type...</option>
-              <option value="Food 식품">Food 식품</option>
-              <option value="Cosmetics 화장품">Cosmetics 화장품</option>
-              <option value="Pharmaceuticals 의약품">Pharmaceuticals 의약품</option>
+              <option value="Food">Food</option>
+              <option value="Cosmetics">Cosmetics</option>
+              <option value="Pharmaceuticals">Pharmaceuticals</option>
             </select>
           </div>
           <div class="field">
-            <label>Manufacturing Method <span class="kr">/ 제조 방식 *</span></label>
+            <label>Manufacturing Method <span class="kr">*</span></label>
             <select id="mfgMethod">
               <option value="">Select method...</option>
-              <option value="Own Manufacturing 자체 생산">Own Manufacturing 자체 생산</option>
+              <option value="Own Manufacturing">Own Manufacturing</option>
               <option value="OEM">OEM</option>
               <option value="ODM">ODM</option>
             </select>
           </div>
         </div>
         <div class="field">
-          <label>Target Certification Market <span class="kr">/ 인증 목표 시장 *</span></label>
+          <label>Target Certification Market <span class="kr">*</span></label>
           <select id="certMarket">
             <option value="">Select market...</option>
             <option value="Indonesia (BPJPH)">Indonesia (BPJPH)</option>
@@ -266,198 +322,198 @@
           </select>
           <div style="margin-top:6px;padding:7px 10px;background:rgba(234,179,8,0.06);border:1px solid rgba(234,179,8,0.15);border-radius:4px;font-size:11px;color:var(--text3);">
             ⚠ PoC v0.8: Rule DB is currently Indonesia (BPJPH) based. Market-specific rule localization (Malaysia JAKIM / UAE ESMA) is planned for MVP.<br>
-            <span style="color:var(--text3);">현재 Rule DB는 인도네시아(BPJPH) 기준입니다. 시장별 규칙 분기는 MVP에서 구현 예정입니다.</span>
+            <span style="color:var(--text3);">Rule DBBPJPH) . MVP.</span>
           </div>
         </div>
 
-        <div class="section-title">Contact Person 담당자 정보</div>
+        <div class="section-title">Contact Person</div>
         <div class="field-row">
           <div class="field">
-            <label>Name <span class="kr">/ 담당자명 *</span></label>
+            <label>Name <span class="kr">*</span></label>
             <input type="text" id="contactName" placeholder="e.g. Kim Jisoo" />
           </div>
           <div class="field">
-            <label>Email <span class="kr">/ 이메일 *</span></label>
+            <label>Email <span class="kr">*</span></label>
             <input type="email" id="contactEmail" placeholder="e.g. jisoo@company.com" />
           </div>
         </div>
         <div class="field-row">
           <div class="field">
-            <label>Phone <span class="kr">/ 연락처</span></label>
+            <label>Phone </label>
             <input type="text" id="contactPhone" placeholder="e.g. +82-10-1234-5678" />
           </div>
           <div class="field">
-            <label>Company Name <span class="kr">/ 회사명</span></label>
+            <label>Company Name </label>
             <input type="text" id="companyName" placeholder="e.g. AmorePacific Co., Ltd." />
           </div>
         </div>
 
         <div class="btn-row">
-          <button class="btn btn-primary" onclick="nextStep(0)">Next: Company Info → <span style="font-size:11px;opacity:0.7">다음</span></button>
+          <button class="btn btn-primary" onclick="nextStep(0)">Next: Company Info →</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ========== STEP 1: Company & Factory Info ========== -->
+  <!--========== STEP 1: Company & Factory Info ==========-->
   <div class="page" id="page1">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 1</span>
-        <span class="panel-title">Company & Factory Info <span class="panel-title-kr">기업·공장 정보</span></span>
+        <span class="panel-title">Company & Factory Info</span>
       </div>
       <div class="panel-body">
 
         <div class="guide-box" style="margin-bottom:18px;">
-          <div class="guide-title">BPJPH SJPH 기준 매핑</div>
-          아래 항목은 BPJPH 할랄 인증(SJPH)의 법인·생산시설 요건에 매핑됩니다. 항목별 근거는 골드 칩으로 표시됩니다.
-          국내 신청은 NIB 기반, 국외(SHLN) 신청은 본국 사업허가 + 수입자 NIB 기반으로 법인 서류가 달라집니다.
-          <span style="display:block;margin-top:4px;color:var(--text3);">※ 국외(SHLN) 전체 제출 목록은 현지 파트너 검증 후 확정 예정.</span>
+          <div class="guide-title">BPJPH SJPH CRITERIA MAPPING</div>
+          Each item below is mapped to a BPJPH halal-certification (SJPH) legal or facility requirement; the regulatory basis is shown in the gold chip.
+          Domestic applications are NIB-based; overseas (SHLN) applications are based on the home-country business license plus the importer's NIB, so the legal documents differ.
+          <span style="display:block;margin-top:4px;color:var(--text3);">Note: the full overseas (SHLN) submission list is pending local-partner verification.</span>
         </div>
 
-        <div class="section-title">Corporate Documents 법인 서류</div>
+        <div class="section-title">Corporate Documents</div>
 
-        <!-- Business Registration -->
+        <!--Business Registration-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_1">!</div>
           <div class="check-label" style="flex:1;">
             Business Identity — NIB / Overseas License
-            <span class="check-label-kr">사업자 식별 — 국내: NIB / 국외(SHLN): 본국 사업허가 + 수입자 NIB</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">신청 루트에 따라 법인 서류가 달라집니다. 국내는 NIB, 국외는 본국 사업허가와 수입자 NIB.</span>
-            <span class="rule-ref">NIB · UU 33/2014 · SiHalal 등록</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Legal documents differ by route: NIB for domestic; home-country business license + importer NIB for overseas.</span>
+            <span class="rule-ref">NIB · UU 33/2014 · SiHalal registration</span> <span class="u-sihalal">SiHalal</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_1')">
               <input type="file" id="f1_1" onchange="markUploaded('f1_1','ci1_1','s1_1')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_1">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <!-- Factory Info -->
+        <!--Factory Info-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_2">!</div>
           <div class="check-label" style="flex:1;">
             Production Facility List &amp; Matrix
-            <span class="check-label-kr">생산시설 목록·식별 + 원료·제품·시설 매트릭스</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">SJPH 매뉴얼의 회사·시설 식별과 원료–제품–생산시설 매트릭스. (평면도는 아래 별도 항목)</span>
-            <span class="rule-ref">Manual SJPH · 시설 식별·매트릭스</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Company/facility identification and the material–product–facility matrix within the SJPH Manual. (Layout drawing is a separate item below.)</span>
+            <span class="rule-ref">Manual SJPH · facility ID &amp; matrix</span> <span class="u-sihalal">SiHalal</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_2')">
               <input type="file" id="f1_2" onchange="markUploaded('f1_2','ci1_2','s1_2')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_2">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <!-- Factory Location Map -->
+        <!--Factory Location Map-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_3">!</div>
           <div class="check-label" style="flex:1;">
             Production Facility Layout
-            <span class="check-label-kr">생산시설 레이아웃 (Layout Fasilitas Produksi)</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">공장 위치·평면도. BPJPH 필수 제출 서류 중 하나.</span>
-            <span class="rule-ref">Layout Fasilitas Produksi · SJPH 필수서류</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Factory location & floor plan. One of the required BPJPH submission documents.</span>
+            <span class="rule-ref">Layout Fasilitas Produksi · required doc</span> <span class="u-sihalal">SiHalal</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_3')">
               <input type="file" id="f1_3" onchange="markUploaded('f1_3','ci1_3','s1_3')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_3">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <!-- Subcontracting -->
+        <!--Subcontracting-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_4">!</div>
           <div class="check-label" style="flex:1;">
             Subcontracting / OEM (maklon) Agreement — if applicable
-            <span class="check-label-kr">위탁 관계 설명서 (OEM/ODM·maklon 해당 시)</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">SJPH 매뉴얼은 위탁생산(maklon)·임대창고 등 모든 관련 시설에 적용됩니다.</span>
-            <span class="rule-ref">Manual SJPH 적용범위 · maklon 포함</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">The SJPH Manual covers all related facilities, including toll manufacturing (maklon) and rented warehouses.</span>
+            <span class="rule-ref">Manual SJPH scope · incl. maklon</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_4')">
               <input type="file" id="f1_4" onchange="markUploaded('f1_4','ci1_4','s1_4')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_4">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <div class="section-title">Halal Production Line Conditions 할랄 생산 라인 조건 (BPJPH)</div>
+        <div class="section-title">Halal Production Line Conditions(BPJPH)</div>
 
-        <!-- Production line separation -->
+        <!--Production line separation-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_5">!</div>
           <div class="check-label" style="flex:1;">
             Production Line Separation Declaration
-            <span class="check-label-kr">할랄 전용 생산 라인 또는 공용 라인 구분 선언서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">전용/공용 여부 선언. 공용이면 교차오염 방지 계획 필요.</span>
-            <span class="rule-ref">SJPH 절차 · 시설 najis 관리</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Declare whether the line is dedicated or shared. If shared, a cross-contamination prevention plan is required.</span>
+            <span class="rule-ref">SJPH procedure · facility najis control</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_5')">
               <input type="file" id="f1_5" onchange="markUploaded('f1_5','ci1_5','s1_5')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_5">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <!-- Non-halal on same line -->
+        <!--Non-halal on same line-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_6">!</div>
           <div class="check-label" style="flex:1;">
             Non-Halal Product Co-Production Statement
-            <span class="check-label-kr">동일 라인 비할랄 제품 생산 여부 확인서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">공용 시 이슬람 율법에 따른 세척(penyucian) 절차 검증 필수.</span>
-            <span class="rule-ref">penyucian 세척절차 · SJPH 절차</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">If shared, ritual cleansing (penyucian) procedure validation per Islamic law is mandatory.</span>
+            <span class="rule-ref">penyucian (ritual cleansing) · SJPH procedure</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_6')">
               <input type="file" id="f1_6" onchange="markUploaded('f1_6','ci1_6','s1_6')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_6">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <!-- Raw material storage -->
+        <!--Raw material storage-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_7">!</div>
           <div class="check-label" style="flex:1;">
             Raw Material Storage Separation Plan
-            <span class="check-label-kr">원료 보관 창고 분리 계획서</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">할랄·비할랄 원료 분리 보관. 저장·운송 단계 najis 오염 방지.</span>
-            <span class="rule-ref">저장·운송 절차 · SJPH · HAS 23000</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Separate storage of halal and non-halal materials; prevent najis contamination during storage and transport.</span>
+            <span class="rule-ref">storage/transport procedure · SJPH · HAS 23000</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_7')">
               <input type="file" id="f1_7" onchange="markUploaded('f1_7','ci1_7','s1_7')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_7">Not uploaded</span>
             </label>
           </div>
         </div>
 
-        <!-- PHT appointment -->
+        <!--PHT appointment-->
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci1_8">!</div>
           <div class="check-label" style="flex:1;">
             Halal Supervisor (Penyelia Halal) — Appointment Set
-            <span class="check-label-kr">할랄 감독관(Penyelia Halal) 관련 서류 일체</span>
-            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">지정서 + 신분증(KTP/ID) + 교육수료증 + BNSP 역량증명(중·대형 기업). UU 33/2014 Pasal 28.</span>
-            <span class="rule-ref">Surat Penetapan Penyelia Halal · BNSP</span>
+            
+            <span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Appointment decree + ID (KTP) + training certificate + BNSP competency certificate (medium/large firms). UU 33/2014 Pasal 28.</span>
+            <span class="rule-ref">Surat Penetapan Penyelia Halal · BNSP</span> <span class="u-sihalal">SiHalal</span> <span class="u-audit">Onsite Audit</span>
           </div>
           <div>
             <label class="upload-zone" onclick="triggerUpload('f1_8')">
               <input type="file" id="f1_8" onchange="markUploaded('f1_8','ci1_8','s1_8')" />
-              <span class="upload-zone-label">📎 Upload / 업로드</span>
+              <span class="upload-zone-label">📎 Upload</span>
               <span class="upload-status not-uploaded" id="s1_8">Not uploaded</span>
             </label>
           </div>
@@ -471,87 +527,86 @@
     </div>
   </div>
 
-  <!-- ========== STEP 2: Ingredients ========== -->
+  <!--========== STEP 2: Ingredients ==========-->
   <div class="page" id="page2">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 2</span>
-        <span class="panel-title">Product Info & Full Ingredient List <span class="panel-title-kr">제품 정보 및 전성분</span></span>
+        <span class="panel-title">Product Info & Full Ingredient List</span>
       </div>
       <div class="panel-body">
         <div class="field">
-          <label>Product Description <span class="kr">/ 제품 설명</span></label>
+          <label>Product Description </label>
           <input type="text" id="productDesc" placeholder="e.g. Water-based moisturizing facial cream for daily use" />
         </div>
         <div class="field">
-          <label>Full Ingredient List <span class="kr">/ 전성분 리스트 (필수)</span></label>
+          <label>Full Ingredient List </label>
 
-          <!-- 입력 방식 안내 -->
+          <!---->
           <div style="margin-bottom:10px;padding:10px 14px;background:rgba(110,231,183,0.04);border:1px solid rgba(110,231,183,0.12);border-radius:6px;font-size:12px;color:var(--text2);">
-            <span style="font-family:var(--mono);font-size:10px;color:var(--accent);display:block;margin-bottom:6px;letter-spacing:0.06em;">INPUT FORMAT 입력 형식</span>
+            <span style="font-family:var(--mono);font-size:10px;color:var(--accent);display:block;margin-bottom:6px;letter-spacing:0.06em;">INPUT FORMAT </span>
             Enter each ingredient as: <span style="font-family:var(--mono);color:var(--text);">Ingredient Name / Supplier (optional)</span>
             &nbsp;&nbsp;or&nbsp;&nbsp;
             <span style="font-family:var(--mono);color:var(--text);">Ingredient Name (Supplier)</span><br>
-            <span style="color:var(--text3);font-size:11px;">성분명 / 공급사명 또는 성분명(공급사명) — 공백 없이 입력해도 인식됩니다</span>
+            
             <div style="margin-top:6px;font-family:var(--mono);font-size:11px;color:var(--text3);">
-              예) Glycerin/KLK Oleamas &nbsp;&nbsp; 또는 &nbsp;&nbsp; Glycerin (KLK Oleamas)<br>
-              예) Ethanol/PT. Indo Acidatama &nbsp;&nbsp; 또는 &nbsp;&nbsp; Ethanol(PT. Indo Acidatama)<br>
-              예) Water &nbsp;&nbsp;(공급사 없으면 성분명만 입력)
-            </div>
+ Glycerin/KLK Oleamas &nbsp;&nbsp;or&nbsp;&nbsp; Glycerin (KLK Oleamas)<br>
+ Ethanol/PT. Indo Acidatama &nbsp;&nbsp;or&nbsp;&nbsp; Ethanol(PT. Indo Acidatama)<br>
+ Water &nbsp;&nbsp;(supplier optional — name only is accepted)</div>
           </div>
 
-          <textarea id="ingredientInput" placeholder="Paste your full ingredient list here (one per line or comma-separated)&#10;전성분을 여기에 붙여넣으세요 (줄바꿈 또는 쉼표 구분)&#10;&#10;Test example:&#10;Water, Glycerin, Lactic Acid, Porcine Gelatin, Ethanol, Fragrance, Cetearyl Alcohol"></textarea>
-          <div class="hint">// Copy from Excel and paste directly. 엑셀에서 복사 후 붙여넣기 가능</div>
+          <textarea id="ingredientInput" placeholder="Paste your full ingredient list here (one per line or comma-separated)&#10;"></textarea>
+          <div class="hint">// Copy from Excel and paste directly. </div>
 
-          <!-- BPJPH 자동 조회 안내 (MVP 예정) -->
+          <!--BPJPH MVP-->
           <div style="margin-top:10px;padding:10px 14px;background:rgba(99,102,241,0.04);border:1px solid rgba(99,102,241,0.15);border-radius:6px;font-size:12px;color:var(--text2);">
-            <span style="font-family:var(--mono);font-size:10px;color:#4F46E5;display:block;margin-bottom:4px;letter-spacing:0.06em;">🔍 BPJPH CERTIFICATE LOOKUP — MVP 예정</span>
+            <span style="font-family:var(--mono);font-size:10px;color:#4F46E5;display:block;margin-bottom:4px;letter-spacing:0.06em;">🔍 BPJPH CERTIFICATE LOOKUP — MVP </span>
             When a supplier/brand name is entered, PreHalal will automatically retrieve the BPJPH halal certificate number, manufacturer, and issuance date from the BPJPH database — eliminating manual lookup on halal.go.id.<br>
-            <span style="color:var(--text3);font-size:11px;">공급사명 입력 시 BPJPH 데이터베이스에서 할랄 인증 번호, 제조사, 발급일을 자동 조회합니다. halal.go.id 수동 검색이 불필요해집니다.</span>
+            
           </div>
         </div>
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="prevStep(2)">← Back</button>
-          <button class="btn btn-primary" onclick="analyzeIngredients()">▶ Run Analysis 성분 분석 실행</button>
+          <button class="btn btn-primary" onclick="analyzeIngredients()">▶ Run Analysis </button>
         </div>
       </div>
     </div>
 
-    <!-- RESULTS (shown after analysis) -->
+    <!--RESULTS (shown after analysis)-->
     <div id="analysisResult" style="display:none;">
 
-      <!-- PoC Disclaimer -->
+      <!--PoC Disclaimer-->
       <div style="margin-bottom:16px;padding:12px 16px;background:rgba(99,102,241,0.06);border:1px solid rgba(99,102,241,0.2);border-radius:6px;font-size:12px;color:var(--text2);">
         <span style="font-family:var(--mono);font-size:10px;color:#4F46E5;letter-spacing:0.06em;display:block;margin-bottom:4px;">PoC PRELIMINARY REVIEW ENGINE</span>
         This analysis is generated by a preliminary review engine for internal workflow use. Results are based on a sample rule set and are not a legal determination of halal compliance. Final certification decisions rest with BPJPH-accredited bodies and qualified consultants.<br>
-        <span style="color:var(--text3);font-size:11px;">본 분석은 내부 사전 검토 워크플로우용입니다. 샘플 규칙 세트 기반이며 법적 할랄 적합성 판정이 아닙니다. 최종 인증 판단은 BPJPH 공인 기관 및 자격 있는 컨설턴트에게 귀속됩니다.</span>
+        
       </div>
 
       <div id="resultSummaryBox"></div>
 
-      <!-- STOP JUMP NOTICE -->
+      <!--STOP JUMP NOTICE-->
       <div id="stopJumpNotice" style="display:none;" class="stop-alert">
         <div class="stop-alert-title">🛑 Prohibited Ingredient Detected — Forwarding to Final Report</div>
-        <div style="font-size:12px;color:var(--text2);">금지 성분이 발견되었습니다. 인증 진행이 불가합니다. 최종 리스크 분기 보고서로 이동합니다.</div>
+        
         <div class="btn-row" style="justify-content:flex-start;margin-top:12px;">
-          <button class="btn btn-danger" onclick="jumpToFinalReport()">→ Go to Final Report 최종 보고서 보기</button>
+          <button class="btn btn-danger" onclick="jumpToFinalReport()">→ Go to Final Report </button>
         </div>
       </div>
 
       <div class="panel">
         <div class="panel-header">
           <span class="panel-step">ANALYSIS</span>
-          <span class="panel-title">Ingredient Review Results <span class="panel-title-kr">성분 판단 결과</span></span>
+          <span class="panel-title">Ingredient Review Results</span>
         </div>
         <div class="panel-body" id="ingredientResults"></div>
       </div>
 
-      <!-- CONSULTANT ONLY: Guide -->
+      <!--CONSULTANT ONLY: Guide-->
       <div id="consultantGuidePanel" style="display:none;">
         <div class="panel">
           <div class="panel-header">
             <span class="panel-step">CONSULTANT VIEW</span>
-            <span class="panel-title">Resolution Guide <span class="panel-title-kr">해결 가이드</span></span>
+            <span class="panel-title">Resolution Guide</span>
           </div>
           <div class="panel-body" id="consultantGuide"></div>
         </div>
@@ -564,36 +619,36 @@
     </div>
   </div>
 
-  <!-- ========== STEP 3: Raw Material Evidence ========== -->
+  <!--========== STEP 3: Raw Material Evidence ==========-->
   <div class="page" id="page3">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 3</span>
-        <span class="panel-title">Raw Material Evidence <span class="panel-title-kr">원료 단위 증빙</span></span>
+        <span class="panel-title">Raw Material Evidence</span>
       </div>
       <div class="panel-body">
 
-        <!-- HOLD/STOP ingredients re-shown -->
+        <!--HOLD/STOP ingredients re-shown-->
         <div id="step3IssueIngredients"></div>
 
-        <div class="section-title" style="margin-top:20px;">Bulk / Shared Upload (optional) 공통·일괄 업로드 (선택)</div>
-        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Use the per-ingredient cards above for each flagged ingredient. This section is for documents that cover multiple ingredients at once (e.g., one CoA spanning several materials) or general spec sheets.<br><span style="color:var(--text3);">개별 원료 증빙은 위 카드에서 업로드하세요. 이 섹션은 한 문서가 여러 원료를 커버하거나(예: 여러 원료를 포함한 CoA) 전 성분 공통 규격서를 한 번에 올릴 때 사용합니다.</span></p>
+        <div class="section-title" style="margin-top:20px;">Bulk / Shared Upload (optional) </div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">Use the per-ingredient cards above for each flagged ingredient. This section is for documents that cover multiple ingredients at once (e.g., one CoA spanning several materials) or general spec sheets.<br><span style="color:var(--text3);">. : CoA) .</span></p>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_1">!</div>
-          <div class="check-label" style="flex:1;">Specification Sheets (all ingredients)<span class="check-label-kr">전 성분 규격서</span></div>
+          <div class="check-label" style="flex:1;">Specification Sheets (all ingredients)</div>
           <label class="upload-zone" onclick="triggerUpload('f3_1')">
             <input type="file" id="f3_1" multiple onchange="markUploaded('f3_1','ci3_1','s3_1')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_1">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_2">!</div>
-          <div class="check-label" style="flex:1;">Certificate of Analysis — COA<span class="check-label-kr">성적서 (COA)</span></div>
+          <div class="check-label" style="flex:1;">Certificate of Analysis — COA</div>
           <label class="upload-zone" onclick="triggerUpload('f3_2')">
             <input type="file" id="f3_2" multiple onchange="markUploaded('f3_2','ci3_2','s3_2')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_2">Not uploaded</span>
           </label>
         </div>
@@ -602,73 +657,72 @@
           <div class="check-label" style="flex:1;">MSDS / SDS</div>
           <label class="upload-zone" onclick="triggerUpload('f3_3')">
             <input type="file" id="f3_3" multiple onchange="markUploaded('f3_3','ci3_3','s3_3')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_3">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_4">!</div>
-          <div class="check-label" style="flex:1;">Halal Certificates for ingredients (if available)<span class="check-label-kr">원료 할랄 인증서 (보유 시)</span></div>
+          <div class="check-label" style="flex:1;">Halal Certificates for ingredients (if available)</div>
           <label class="upload-zone" onclick="triggerUpload('f3_4')">
             <input type="file" id="f3_4" multiple onchange="markUploaded('f3_4','ci3_4','s3_4')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_4">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_5">!</div>
-          <div class="check-label" style="flex:1;">Origin Declaration — Animal / Plant / Synthetic / Microbial<span class="check-label-kr">원료 유래 설명서 (동물/식물/합성/미생물, 발효 여부)</span></div>
+          <div class="check-label" style="flex:1;">Origin Declaration — Animal / Plant / Synthetic / Microbial</div>
           <label class="upload-zone" onclick="triggerUpload('f3_5')">
             <input type="file" id="f3_5" multiple onchange="markUploaded('f3_5','ci3_5','s3_5')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_5">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_6">!</div>
-          <div class="check-label" style="flex:1;">Slaughter / Processing Method Certificate (animal-derived only)<span class="check-label-kr">도축·가공 방법 증빙 (동물 유래 원료 해당 시)</span></div>
+          <div class="check-label" style="flex:1;">Slaughter / Processing Method Certificate (animal-derived only)</div>
           <label class="upload-zone" onclick="triggerUpload('f3_6')">
             <input type="file" id="f3_6" multiple onchange="markUploaded('f3_6','ci3_6','s3_6')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_6">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_7">!</div>
-          <div class="check-label" style="flex:1;">Fermentation Medium Declaration (fermented ingredients)<span class="check-label-kr">발효 배지 선언서 (발효 공정 원료 해당 시)</span></div>
+          <div class="check-label" style="flex:1;">Fermentation Medium Declaration (fermented ingredients)</div>
           <label class="upload-zone" onclick="triggerUpload('f3_7')">
             <input type="file" id="f3_7" multiple onchange="markUploaded('f3_7','ci3_7','s3_7')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_7">Not uploaded</span>
           </label>
         </div>
 
-        <!-- 포장재 섹션 -->
+        <!---->
         <div class="section-title" style="margin-top:28px;">
-          Packaging Materials 포장재
-        </div>
+          Packaging Materials </div>
         <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
           Packaging materials are subject to halal review under BPJPH regulations.<br>
-          <span style="color:var(--text3);">포장재도 BPJPH 규정상 할랄 검토 대상입니다.</span>
+          
         </p>
 
         <div style="margin-bottom:12px;padding:10px 14px;background:rgba(234,179,8,0.04);border:1px solid rgba(234,179,8,0.15);border-radius:6px;font-size:12px;color:var(--text2);">
-          <span style="font-family:var(--mono);font-size:10px;color:var(--yellow);display:block;margin-bottom:4px;letter-spacing:0.06em;">📅 REGULATORY TIMELINE 규정 일정</span>
+          <span style="font-family:var(--mono);font-size:10px;color:var(--yellow);display:block;margin-bottom:4px;letter-spacing:0.06em;">📅 REGULATORY TIMELINE </span>
           <b style="color:var(--text);">Until October 2026:</b> Non-porcine declaration letter required for packaging.<br>
           <b style="color:var(--text);">From October 2026:</b> Full halal certification required for packaging materials.<br>
-          <span style="color:var(--text3);font-size:11px;">2026년 10월까지: 포장재 비돼지 유래 선언서만 필요 / 2026년 10월 이후: 포장재 할랄 인증서 의무화</span>
+          <span style="color:var(--text3);font-size:11px;">2026: :</span>
         </div>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_8">!</div>
           <div class="check-label" style="flex:1;">
             Non-Porcine Declaration for Packaging Materials
-            <span class="check-label-kr">포장재 비돼지 유래 선언서 (현재 필수)</span>
+            
             <span style="display:block;font-size:11px;color:var(--accent2);margin-top:2px;">✓ Required now — Until October 2026</span>
           </div>
           <label class="upload-zone" onclick="triggerUpload('f3_8')">
             <input type="file" id="f3_8" multiple onchange="markUploaded('f3_8','ci3_8','s3_8')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_8">Not uploaded</span>
           </label>
         </div>
@@ -677,7 +731,7 @@
           <div class="check-icon" style="background:var(--surface2);border-color:var(--border2);color:var(--text3);font-size:10px;">📅</div>
           <div class="check-label" style="flex:1;">
             Halal Certificate for Packaging Materials
-            <span class="check-label-kr">포장재 할랄 인증서</span>
+            
             <span style="display:block;font-size:11px;color:var(--yellow);margin-top:2px;">⚠ Required from October 2026 — Prepare in advance</span>
           </div>
           <div style="font-size:11px;color:var(--text3);font-family:var(--mono);padding:0 12px;">UPCOMING</div>
@@ -687,33 +741,32 @@
           <div class="check-icon check-add" id="ci3_9">!</div>
           <div class="check-label" style="flex:1;">
             Packaging Material Specification Sheet
-            <span class="check-label-kr">포장재 규격서 (재질, 성분 정보)</span>
+            
           </div>
           <label class="upload-zone" onclick="triggerUpload('f3_9')">
             <input type="file" id="f3_9" multiple onchange="markUploaded('f3_9','ci3_9','s3_9')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_9">Not uploaded</span>
           </label>
         </div>
 
-        <!-- 세척제 섹션 -->
+        <!---->
         <div class="section-title" style="margin-top:28px;">
-          Cleaning Agents 세척제
-        </div>
+          Cleaning Agents </div>
         <p style="font-size:12px;color:var(--text2);margin-bottom:12px;">
           Cleaning agents used on production equipment must also be halal-compliant under BPJPH SJPH requirements.<br>
-          <span style="color:var(--text3);">생산 설비에 사용되는 세척제도 BPJPH SJPH 기준상 할랄 적합 여부 확인이 필요합니다.</span>
+          <span style="color:var(--text3);">BPJPH SJPH .</span>
         </p>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci3_10">!</div>
           <div class="check-label" style="flex:1;">
             Cleaning Agent List (all agents used in production)
-            <span class="check-label-kr">세척제 목록 (생산 공정 전체)</span>
+            
           </div>
           <label class="upload-zone" onclick="triggerUpload('f3_10')">
             <input type="file" id="f3_10" multiple onchange="markUploaded('f3_10','ci3_10','s3_10')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_10">Not uploaded</span>
           </label>
         </div>
@@ -722,11 +775,11 @@
           <div class="check-icon check-add" id="ci3_11">!</div>
           <div class="check-label" style="flex:1;">
             Halal Certificate or Origin Declaration for Cleaning Agents
-            <span class="check-label-kr">세척제 할랄 인증서 또는 원료 유래 선언서</span>
+            
           </div>
           <label class="upload-zone" onclick="triggerUpload('f3_11')">
             <input type="file" id="f3_11" multiple onchange="markUploaded('f3_11','ci3_11','s3_11')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s3_11">Not uploaded</span>
           </label>
         </div>
@@ -739,88 +792,79 @@
     </div>
   </div>
 
-  <!-- ========== STEP 4: Manufacturing Process ========== -->
+  <!--========== STEP 4: Manufacturing Process ==========-->
   <div class="page" id="page4">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 4</span>
-        <span class="panel-title">Manufacturing Process & Equipment <span class="panel-title-kr">제조 공정 및 설비</span></span>
+        <span class="panel-title">Manufacturing Process & Equipment</span>
       </div>
       <div class="panel-body">
-        <div class="section-title">Process Documents 공정 서류</div>
+        <div class="section-title">Process Documents</div>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_1">!</div>
-          <div class="check-label" style="flex:1;">Process Flow Diagram<span class="check-label-kr">공정도 (Flow Chart)</span></div>
+          <div class="check-label" style="flex:1;">Process Flow Diagram</div>
           <label class="upload-zone" onclick="triggerUpload('f4_1')">
             <input type="file" id="f4_1" onchange="markUploaded('f4_1','ci4_1','s4_1')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_1">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_2">!</div>
-          <div class="check-label" style="flex:1;">Equipment List<span class="check-label-kr">설비 리스트</span></div>
+          <div class="check-label" style="flex:1;">Equipment List</div>
           <label class="upload-zone" onclick="triggerUpload('f4_2')">
             <input type="file" id="f4_2" onchange="markUploaded('f4_2','ci4_2','s4_2')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_2">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_3">!</div>
-          <div class="check-label" style="flex:1;">Shared Equipment Product List<span class="check-label-kr">동일 설비 사용 제품 목록</span></div>
+          <div class="check-label" style="flex:1;">Shared Equipment Product List</div>
           <label class="upload-zone" onclick="triggerUpload('f4_3')">
             <input type="file" id="f4_3" onchange="markUploaded('f4_3','ci4_3','s4_3')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_3">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_4">!</div>
-          <div class="check-label" style="flex:1;">Equipment Cleaning Procedure<span class="check-label-kr">설비 세척 절차서</span></div>
+          <div class="check-label" style="flex:1;">Equipment Cleaning Procedure</div>
           <label class="upload-zone" onclick="triggerUpload('f4_4')">
             <input type="file" id="f4_4" onchange="markUploaded('f4_4','ci4_4','s4_4')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_4">Not uploaded</span>
           </label>
         </div>
 
-        <div class="section-title">Additional BPJPH Requirements 추가 BPJPH 요구사항</div>
+        <div class="section-title">Additional BPJPH RequirementsBPJPH</div>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_5">!</div>
-          <div class="check-label" style="flex:1;">Cross-Contamination Prevention Plan<span class="check-label-kr">교차오염 방지 계획서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Required if shared production line with non-halal products.</span></div>
+          <div class="check-label" style="flex:1;">Cross-Contamination Prevention Plan<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Required if shared production line with non-halal products.</span></div>
           <label class="upload-zone" onclick="triggerUpload('f4_5')">
             <input type="file" id="f4_5" onchange="markUploaded('f4_5','ci4_5','s4_5')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_5">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
-          <div class="check-icon check-add" id="ci4_6">!</div>
-          <div class="check-label" style="flex:1;">Halal Zone Marking / Layout Drawing<span class="check-label-kr">할랄 구역 표시 도면</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Physical segregation of halal production zones.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f4_6')">
-            <input type="file" id="f4_6" onchange="markUploaded('f4_6','ci4_6','s4_6')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s4_6">Not uploaded</span>
-          </label>
-        </div>
-        <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_7">!</div>
-          <div class="check-label" style="flex:1;">Hazardous Material & Prohibited Substance Management Records<span class="check-label-kr">유해물질 및 금지물질 관리 기록</span></div>
+          <div class="check-label" style="flex:1;">Najis / Haram Material Handling Record<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Handling/segregation record for najis or haram materials, per SJPH SOP (SOP Penanganan Produk Tidak Sesuai).</span></div>
           <label class="upload-zone" onclick="triggerUpload('f4_7')">
             <input type="file" id="f4_7" onchange="markUploaded('f4_7','ci4_7','s4_7')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_7">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci4_8">!</div>
-          <div class="check-label" style="flex:1;">Production Record / Batch Record Sample<span class="check-label-kr">생산 기록 / 배치 기록 샘플</span></div>
+          <div class="check-label" style="flex:1;">Production Record / Batch Record Sample</div>
           <label class="upload-zone" onclick="triggerUpload('f4_8')">
             <input type="file" id="f4_8" onchange="markUploaded('f4_8','ci4_8','s4_8')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s4_8">Not uploaded</span>
           </label>
         </div>
@@ -833,91 +877,74 @@
     </div>
   </div>
 
-  <!-- ========== STEP 5: HAS/SJPH ========== -->
+  <!--========== STEP 5: HAS/SJPH ==========-->
   <div class="page" id="page5">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 5</span>
-        <span class="panel-title">Halal Management System <span class="panel-title-kr">할랄 관리 시스템 HAS/SJPH</span></span>
+        <span class="panel-title">SJPH Document Register</span>
       </div>
       <div class="panel-body">
-        <div class="section-title">Core HAS Documents 핵심 HAS 문서</div>
-
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_1">!</div>
-          <div class="check-label" style="flex:1;">Halal Policy Declaration<span class="check-label-kr">할랄 방침 선언문</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_1')">
-            <input type="file" id="f5_1" onchange="markUploaded('f5_1','ci5_1','s5_1')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_1">Not uploaded</span>
-          </label>
+        <div class="reg-summary">
+          <div><span class="rs-num">68</span> <span class="rs-lab">documents</span></div>
+          <div><span class="rs-num" style="color:var(--accent2)">24</span> <span class="rs-lab">SiHalal submission</span></div>
+          <div><span class="rs-num" style="color:var(--yellow)">44</span> <span class="rs-lab">onsite audit</span></div>
+          <div class="rs-lab" style="margin-left:auto">SJPH 5 Criteria · Partner Documentation Library</div>
         </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_2">!</div>
-          <div class="check-label" style="flex:1;">Halal Supervisor (PHT) Appointment Document<span class="check-label-kr">할랄 담당자 지정 문서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Penyelia Halal — required under UU No.33/2014.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_2')">
-            <input type="file" id="f5_2" onchange="markUploaded('f5_2','ci5_2','s5_2')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_2">Not uploaded</span>
-          </label>
+        <div class="reg-legend">
+          <span><span class="u-sihalal">SiHalal</span> submitted online via SiHalal</span>
+          <span><span class="u-audit">Onsite Audit</span> verified during on-site audit</span>
+          <span><span class="t-template">Template</span> / <span class="t-evidence">Evidence</span> / <span class="t-sop">Ready SOP</span></span>
         </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_3">!</div>
-          <div class="check-label" style="flex:1;">Halal Training Records<span class="check-label-kr">할랄 교육 기록</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_3')">
-            <input type="file" id="f5_3" onchange="markUploaded('f5_3','ci5_3','s5_3')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_3">Not uploaded</span>
-          </label>
+        <div style="font-size:11px;color:var(--text3);margin-bottom:16px;line-height:1.6;">
+          This register maps the partner (Nurul / HalalEase) licensed documentation library to the 5 SJPH criteria.
+          It shows document <b>structure and usage tags only</b>; the actual templates are licensed IP and are not embedded in this demo.
         </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_4">!</div>
-          <div class="check-label" style="flex:1;">Internal Halal Audit Records<span class="check-label-kr">내부 할랄 감사 기록</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_4')">
-            <input type="file" id="f5_4" onchange="markUploaded('f5_4','ci5_4','s5_4')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_4">Not uploaded</span>
-          </label>
-        </div>
-
-        <div class="section-title">Additional BPJPH Requirements 추가 요구사항</div>
-
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_5">!</div>
-          <div class="check-label" style="flex:1;">Halal Internal Audit Checklist (SJPH)<span class="check-label-kr">내부 할랄 감사 체크리스트 (SJPH 양식)</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_5')">
-            <input type="file" id="f5_5" onchange="markUploaded('f5_5','ci5_5','s5_5')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_5">Not uploaded</span>
-          </label>
-        </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_6">!</div>
-          <div class="check-label" style="flex:1;">Halal Crisis Management Procedure<span class="check-label-kr">할랄 위기관리 절차서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Procedure for handling halal violations or contamination events.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_6')">
-            <input type="file" id="f5_6" onchange="markUploaded('f5_6','ci5_6','s5_6')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_6">Not uploaded</span>
-          </label>
-        </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_7">!</div>
-          <div class="check-label" style="flex:1;">Supply Chain Management Records<span class="check-label-kr">공급망 관리 기록</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Records of approved halal supplier list and purchase documentation.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_7')">
-            <input type="file" id="f5_7" onchange="markUploaded('f5_7','ci5_7','s5_7')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_7">Not uploaded</span>
-          </label>
-        </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci5_8">!</div>
-          <div class="check-label" style="flex:1;">Product Recall Procedure (Halal-related)<span class="check-label-kr">제품 리콜 절차 (할랄 관련)</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f5_8')">
-            <input type="file" id="f5_8" onchange="markUploaded('f5_8','ci5_8','s5_8')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s5_8">Not uploaded</span>
-          </label>
-        </div>
+        <div class="reg-crit"><span class="reg-crit-badge">A</span><span><span class="reg-crit-name">Komitmen dan Tanggung Jawab</span><span class="reg-crit-kr">Commitment &amp; Responsibility</span></span></div>
+        <div class="reg-row"><span class="reg-name">Halal Policy Statement<span class="reg-id">Pernyataan Kebijakan Halal</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Internal Policy Socialization Evidence<span class="reg-id">Bukti Sosialisasi Kebijakan Halal Internal</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-row"><span class="reg-name">External Policy Socialization Evidence<span class="reg-id">Bukti Sosialisasi Kebijakan Halal Eksternal</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-sub"><span class="reg-sub-name">Halal Supervisor Documents</span><span class="reg-sub-id">Dokumen Penyelia Halal</span><span class="reg-sub-count">4</span></div>
+        <div class="reg-row"><span class="reg-name">Supervisor Training Certificate<span class="reg-id">Sertifikat Pelatihan Penyelia Halal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-row"><span class="reg-name">Supervisor Competency (BNSP) Certificate<span class="reg-id">Sertifikat Kompetensi Penyelia Halal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-row"><span class="reg-name">National ID (KTP)<span class="reg-id">KTP</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-row"><span class="reg-name">Supervisor Appointment Decree<span class="reg-id">SK Penunjukan Penyelia Halal</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-sub"><span class="reg-sub-name">Halal Management Team Documents</span><span class="reg-sub-id">Dokumen Tim Manajemen Halal</span><span class="reg-sub-count">3</span></div>
+        <div class="reg-row"><span class="reg-name">Team Appointment Decree<span class="reg-id">SK Penunjukan Tim Manajemen Halal</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Roles &amp; Responsibilities<span class="reg-id">Uraian Tugas &amp; Tanggung Jawab</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Team Training Evidence<span class="reg-id">Bukti Pelatihan Tim Manajemen Halal</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-sub"><span class="reg-sub-name">Employee SJPH Training</span><span class="reg-sub-id">Pelatihan SJPH Karyawan</span><span class="reg-sub-count">5</span></div>
+        <div class="reg-row"><span class="reg-name">Training Material<span class="reg-id">Materi Pelatihan</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-sop">Ready SOP</span></span></div>
+        <div class="reg-row"><span class="reg-name">Attendance List<span class="reg-id">Daftar Hadir</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Post-Test Questions<span class="reg-id">Soal Post Test</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-sop">Ready SOP</span></span></div>
+        <div class="reg-row"><span class="reg-name">Post-Test Evaluation Evidence<span class="reg-id">Bukti Evaluasi Pelatihan</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Training Documentation<span class="reg-id">Dokumentasi Pelatihan</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-crit"><span class="reg-crit-badge">B</span><span><span class="reg-crit-name">Bahan</span><span class="reg-crit-kr">Materials</span></span></div>
+        <div class="reg-row"><span class="reg-name">Halal Material List<span class="reg-id">Daftar Bahan Halal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Material–Product Matrix<span class="reg-id">Dokumen Matriks Bahan dan Produk</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-crit"><span class="reg-crit-badge">C</span><span><span class="reg-crit-name">Proses Produk Halal</span><span class="reg-crit-kr">Halal Product Process</span></span></div>
+        <div class="reg-row"><span class="reg-name">Production Facility Address List (HO, warehouse, outlet)<span class="reg-id">Daftar Alamat Semua Fasilitas Produksi</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Facility Layout (all sites)<span class="reg-id">Layout Seluruh Fasilitas Produksi</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-sub"><span class="reg-sub-name">SOP Implementation</span><span class="reg-sub-id">Implementasi SOP</span><span class="reg-sub-count">20</span></div>
+        <div class="reg-grid"><div class="reg-chip" title="SOP Seleksi Bahan Baru"><span class="reg-chip-name">New Material Selection SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pembelian Bahan"><span class="reg-chip-name">Material Purchasing SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Penerimaan Bahan"><span class="reg-chip-name">Material Receiving SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Penyimpanan Bahan dan Produk"><span class="reg-chip-name">Material &amp; Product Storage SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Produksi"><span class="reg-chip-name">Production SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pengiriman Bahan dan Produk"><span class="reg-chip-name">Material &amp; Product Shipping SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pencucian"><span class="reg-chip-name">Washing SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pensucian"><span class="reg-chip-name">Ritual Cleansing SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Penanganan Produk Tidak Sesuai"><span class="reg-chip-name">Non-Conforming Product Handling SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Penarikan Produk (Recall)"><span class="reg-chip-name">Product Recall SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pengembangan Produk Baru"><span class="reg-chip-name">New Product Development SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pengembangan Fasilitas Baru"><span class="reg-chip-name">New Facility Development SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Mampu Telusur (Traceability)"><span class="reg-chip-name">Traceability SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Monitoring Kevalidan Dokumen Bahan"><span class="reg-chip-name">Material Document Validity Monitoring SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Pelatihan"><span class="reg-chip-name">Training SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Personal Hygiene"><span class="reg-chip-name">Personal Hygiene SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Internal Audit"><span class="reg-chip-name">Internal Audit SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Kaji Ulang Manajemen"><span class="reg-chip-name">Management Review SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Penanganan Hama"><span class="reg-chip-name">Pest Control SOP</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="SOP Aturan Karyawan &amp; Penyajian (Resto)"><span class="reg-chip-name">Staff &amp; Serving Rules SOP (Resto)</span><span class="u-audit u-mini">Audit</span></div></div>
+        <div class="reg-sub"><span class="reg-sub-name">Form &amp; Checklist Implementation</span><span class="reg-sub-id">Implementasi Form &amp; Checklist</span><span class="reg-sub-count">17</span></div>
+        <div class="reg-grid"><div class="reg-chip" title="Form Pengembangan Produk Baru"><span class="reg-chip-name">New Product Development Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Penambahan Fasilitas Baru"><span class="reg-chip-name">New Facility Addition Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Seleksi Bahan Baru"><span class="reg-chip-name">New Material Selection Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Pembelian Bahan"><span class="reg-chip-name">Material Purchasing Form</span><span class="u-sihalal u-mini">SiHalal</span></div><div class="reg-chip" title="Form Penerimaan Bahan"><span class="reg-chip-name">Material Receiving Form</span><span class="u-sihalal u-mini">SiHalal</span></div><div class="reg-chip" title="Form Penyimpanan (Stock Opname)"><span class="reg-chip-name">Storage Form (Stock Opname)</span><span class="u-sihalal u-mini">SiHalal</span></div><div class="reg-chip" title="Form Hasil Produksi"><span class="reg-chip-name">Production Output Form</span><span class="u-sihalal u-mini">SiHalal</span></div><div class="reg-chip" title="Form Penjualan Produk"><span class="reg-chip-name">Product Sales Form</span><span class="u-sihalal u-mini">SiHalal</span></div><div class="reg-chip" title="Form Distribusi Produk"><span class="reg-chip-name">Product Distribution Form</span><span class="u-sihalal u-mini">SiHalal</span></div><div class="reg-chip" title="Checklist Kebersihan Peralatan"><span class="reg-chip-name">Equipment Cleanliness Checklist</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Checklist Kebersihan Area"><span class="reg-chip-name">Area Cleanliness Checklist</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Pengendalian Hama"><span class="reg-chip-name">Pest Control Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Pemusnahan Produk"><span class="reg-chip-name">Product Disposal Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Penarikan Produk (Recall)"><span class="reg-chip-name">Product Recall Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Tindakan Perbaikan (CAPA)"><span class="reg-chip-name">Corrective Action Form (CAPA)</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Ceklis Audit Internal"><span class="reg-chip-name">Internal Audit Checklist Form</span><span class="u-audit u-mini">Audit</span></div><div class="reg-chip" title="Form Notulensi Kaji Ulang Manajemen"><span class="reg-chip-name">Management Review Minutes Form</span><span class="u-audit u-mini">Audit</span></div></div>
+        <div class="reg-row"><span class="reg-name">Pork-Free Declaration<span class="reg-id">Surat Pernyataan Bebas Babi</span></span><span class="reg-tags"><span class="u-audit">Onsite Audit</span><span class="t-template">Template</span></span></div>
+        <div class="reg-crit"><span class="reg-crit-badge">D</span><span><span class="reg-crit-name">Produk</span><span class="reg-crit-kr">Product</span></span></div>
+        <div class="reg-row"><span class="reg-name">Product List<span class="reg-id">Daftar Produk</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Product Photos<span class="reg-id">Foto Produk</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-row"><span class="reg-name">Production Flow Diagram<span class="reg-id">Diagram Alir Produksi Produk</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-crit"><span class="reg-crit-badge">E</span><span><span class="reg-crit-name">Pemantauan dan Evaluasi</span><span class="reg-crit-kr">Monitoring &amp; Evaluation</span></span></div>
+        <div class="reg-row"><span class="reg-name">Internal Audit Checklist<span class="reg-id">Ceklis Audit Internal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Management Review Document<span class="reg-id">Dokumen Kaji Ulang Manajemen</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-crit"><span class="reg-crit-badge plus">+</span><span><span class="reg-crit-name">Dokumen Lain-lain</span><span class="reg-crit-kr">Other SiHalal Documents</span></span></div>
+        <div class="reg-row"><span class="reg-name">Legal Documents (NPWP &amp; NIB)<span class="reg-id">Legalitas (NPWP &amp; NIB)</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-evidence">Evidence</span></span></div>
+        <div class="reg-row"><span class="reg-name">Registration Form<span class="reg-id">Formulir Pendaftaran</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">Halal Certification Application Letter<span class="reg-id">Surat Permohonan Sertifikasi Halal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-row"><span class="reg-name">SJPH Manual<span class="reg-id">Manual SJPH</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-template">Template</span></span></div>
+        <div class="reg-crit"><span class="reg-crit-badge plus">+</span><span><span class="reg-crit-name">Informasi Tambahan</span><span class="reg-crit-kr">Additional Info (SiHalal)</span></span></div>
+        <div class="reg-row"><span class="reg-name">PIC Name, Phone, Email, Digital Signature<span class="reg-id">Nama, HP, Email, TTD Digital PIC</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-info">Info</span></span></div>
+        <div class="reg-row"><span class="reg-name">Supervisor Phone &amp; Digital Signature<span class="reg-id">HP &amp; TTD Digital Penyelia Halal</span></span><span class="reg-tags"><span class="u-sihalal">SiHalal</span><span class="t-info">Info</span></span></div>
 
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="prevStep(5)">← Back</button>
@@ -927,83 +954,55 @@
     </div>
   </div>
 
-  <!-- ========== STEP 6: Labeling ========== -->
+  <!--========== STEP 6: Labeling ==========-->
   <div class="page" id="page6">
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 6</span>
-        <span class="panel-title">Label & Packaging <span class="panel-title-kr">라벨·패키징</span></span>
+        <span class="panel-title">Label & Packaging</span>
       </div>
       <div class="panel-body">
-        <div class="section-title">Label Documents 라벨 서류</div>
+        <div class="section-title">Label Documents</div>
 
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_1">!</div>
-          <div class="check-label" style="flex:1;">Label Draft / Artwork<span class="check-label-kr">라벨 시안</span></div>
+          <div class="check-label" style="flex:1;">Label Draft / Artwork</div>
           <label class="upload-zone" onclick="triggerUpload('f6_1')">
             <input type="file" id="f6_1" onchange="markUploaded('f6_1','ci6_1','s6_1')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_1">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_2">!</div>
-          <div class="check-label" style="flex:1;">Ingredient Labeling on Package<span class="check-label-kr">패키지 성분 표기</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Must match submitted ingredient list exactly.</span></div>
+          <div class="check-label" style="flex:1;">Ingredient Labeling on Package<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Must match submitted ingredient list exactly.</span></div>
           <label class="upload-zone" onclick="triggerUpload('f6_2')">
             <input type="file" id="f6_2" onchange="markUploaded('f6_2','ci6_2','s6_2')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_2">Not uploaded</span>
           </label>
         </div>
         <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_3">!</div>
-          <div class="check-label" style="flex:1;">Halal Logo Usage Plan<span class="check-label-kr">할랄 로고 사용 계획서</span></div>
+          <div class="check-label" style="flex:1;">Halal Logo Usage Plan</div>
           <label class="upload-zone" onclick="triggerUpload('f6_3')">
             <input type="file" id="f6_3" onchange="markUploaded('f6_3','ci6_3','s6_3')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_3">Not uploaded</span>
           </label>
         </div>
 
-        <div class="section-title">Additional BPJPH Requirements 추가 요구사항</div>
+        <div class="section-title">Additional BPJPH Requirements</div>
 
         <div class="checklist-item">
-          <div class="check-icon check-add" id="ci6_4">!</div>
-          <div class="check-label" style="flex:1;">Packaging Material Composition Sheet<span class="check-label-kr">포장재 성분 명세서</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">Packaging materials must not contain prohibited substances.</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f6_4')">
-            <input type="file" id="f6_4" onchange="markUploaded('f6_4','ci6_4','s6_4')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s6_4">Not uploaded</span>
-          </label>
-        </div>
-        <div class="checklist-item">
           <div class="check-icon check-add" id="ci6_5">!</div>
-          <div class="check-label" style="flex:1;">Multilingual Label (Bahasa Indonesia required)<span class="check-label-kr">다국어 라벨 (인도네시아어 포함 필수)</span><span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">BPJPH requires Bahasa Indonesia on all labels for Indonesian market.</span></div>
+          <div class="check-label" style="flex:1;">Multilingual Label (Bahasa Indonesia required)<span style="font-size:11px;color:var(--text3);display:block;margin-top:2px;">BPJPH requires Bahasa Indonesia on all labels for Indonesian market.</span></div>
           <label class="upload-zone" onclick="triggerUpload('f6_5')">
             <input type="file" id="f6_5" onchange="markUploaded('f6_5','ci6_5','s6_5')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s6_5">Not uploaded</span>
           </label>
         </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci6_6">!</div>
-          <div class="check-label" style="flex:1;">Halal Logo Approval Application (BPJPH Form)<span class="check-label-kr">할랄 로고 승인 신청서 (BPJPH 양식)</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f6_6')">
-            <input type="file" id="f6_6" onchange="markUploaded('f6_6','ci6_6','s6_6')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s6_6">Not uploaded</span>
-          </label>
-        </div>
-        <div class="checklist-item">
-          <div class="check-icon check-add" id="ci6_7">!</div>
-          <div class="check-label" style="flex:1;">Product Net Weight / Volume Declaration<span class="check-label-kr">제품 순 중량/용량 표기 선언서</span></div>
-          <label class="upload-zone" onclick="triggerUpload('f6_7')">
-            <input type="file" id="f6_7" onchange="markUploaded('f6_7','ci6_7','s6_7')" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
-            <span class="upload-status not-uploaded" id="s6_7">Not uploaded</span>
-          </label>
-        </div>
-
         <div class="btn-row">
           <button class="btn btn-ghost" onclick="prevStep(6)">← Back</button>
           <button class="btn btn-primary" onclick="nextStep(6)">Generate Risk Branch Report →</button>
@@ -1012,12 +1011,12 @@
     </div>
   </div>
 
-  <!-- ========== STEP 7: Final Risk Branch Report ========== -->
+  <!--========== STEP 7: Final Risk Branch Report ==========-->
   <div class="page" id="page7">
     <div id="finalReport"></div>
   </div>
 
-</div><!-- /container -->
+</div><!--/container-->
 
 <script>
 // ============================================================
@@ -1078,7 +1077,7 @@ function updateProgress(active) {
 }
 
 function nextStep(current) {
-  if (current === 2 && analysisResults.length === 0) { alert('Please run the ingredient analysis first.\n먼저 성분 분석을 실행해 주세요.'); return; }
+  if (current === 2 && analysisResults.length === 0) { alert('Please run the ingredient analysis first.'); return; }
   if (current < 7) { showPage(current+1); if (current+1===7) generateFinalReport(); }
 }
 function prevStep(current) { if (current > 0) showPage(current-1); }
@@ -1631,13 +1630,13 @@ function matchIngredient(name) {
         .map(r => `[${r.canonical||r.status}] ${r.reason_en||''}`)
         .join(" | ");
       const compSummary_kr = criticalComponents
-        .map(r => `[${r.canonical||r.status}] ${r.reason_kr||''}`)
+        .map(r => `[${r.canonical||r.status}] ${r.reason_en||''}`)
         .join(" | ");
       const compGuide_en = criticalComponents
         .map(r => r.guide_en||'')
         .filter(Boolean).join(" | ");
       const compGuide_kr = criticalComponents
-        .map(r => r.guide_kr||'')
+        .map(r => r.guide_en||'')
         .filter(Boolean).join(" | ");
       const compRefs = [...new Set(criticalComponents.map(r => r.rule_ref).filter(Boolean))].join("; ");
 
@@ -1765,7 +1764,7 @@ function analyzeIngredients() {
   const resultDiv = document.getElementById('analysisResult');
   const ingDiv = document.getElementById('ingredientResults');
   resultDiv.style.display = 'block';
-  ingDiv.innerHTML = '<div class="analyzing"><span>●</span> Analyzing ingredients / 성분 분석 중...</div>';
+ ingDiv.innerHTML = '<div class="analyzing"><span>●</span> Analyzing ingredients...</div>';
   document.getElementById('stopJumpNotice').style.display = 'none';
   document.getElementById('step2NextBtn').style.display = 'none';
 
@@ -1836,9 +1835,9 @@ function renderSummary() {
     <div class="result-summary ${c.cls}">
       <div class="result-icon">${c.icon}</div>
       <div class="result-title">${c.title_en}</div>
-      <div style="font-size:12px;opacity:0.7;margin-bottom:6px;">${c.title_kr}</div>
+      
       <div style="font-size:13px;color:var(--text2);">${c.sub_en}</div>
-      <div style="font-size:11px;color:var(--text3);">${c.sub_kr}</div>
+      
       <hr style="margin:12px 0;border-color:rgba(255,255,255,0.08);">
       <div style="display:flex;gap:20px;font-family:var(--mono);font-size:12px;">
         <span style="color:var(--red);">STOP: ${stopC}</span>
@@ -1853,7 +1852,7 @@ function renderIngredientResults() {
   const isConsultant = currentRole === 'consultant';
   const toShow = analysisResults;   // PASS 포함 — 모든 성분 표시 (제조사·컨설턴트 공통)
   if (toShow.length===0) {
-    div.innerHTML = '<div style="color:var(--text3);padding:12px 0;font-size:13px;">No ingredients analyzed. 분석된 성분이 없습니다.</div>';
+    div.innerHTML = '<div style="color:var(--text3);padding:12px 0;font-size:13px;">No ingredients analyzed.</div>';
     return;
   }
   const sc = { STOP:{b:'badge-stop',l:'STOP'}, HOLD:{b:'badge-hold',l:'HOLD'}, PASS:{b:'badge-ok',l:'PASS'} };
@@ -1885,14 +1884,14 @@ function renderIngredientResults() {
       <div style="display:flex;align-items:center;gap:8px;margin-top:4px;">
         <span style="font-size:10px;color:var(--text3);font-family:var(--mono);">SUPPLIER</span>
         <span style="font-size:11px;color:var(--text2);">${r.supplier}</span>
-        <span style="font-size:10px;color:#4F46E5;font-family:var(--mono);padding:1px 6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:3px;">BPJPH LOOKUP — MVP 예정</span>
+ <span style="font-size:10px;color:#4F46E5;font-family:var(--mono);padding:1px 6px;background:rgba(99,102,241,0.08);border:1px solid rgba(99,102,241,0.2);border-radius:3px;">BPJPH LOOKUP — MVP </span>
       </div>` : '';
 
     // 성분별 required docs 자동 생성
     const reqDocs = isConsultant ? getRequiredDocs(r) : null;
     const reqDocsHtml = reqDocs && reqDocs.docs_en.length > 0 ? `
       <div style="margin-top:8px;padding:8px 12px;background:rgba(234,179,8,0.04);border:1px solid rgba(234,179,8,0.15);border-radius:4px;">
-        <div style="font-size:10px;color:var(--yellow);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.06em;">REQUIRED DOCUMENTS 필요 서류</div>
+ <div style="font-size:10px;color:var(--yellow);font-family:var(--mono);margin-bottom:6px;letter-spacing:0.06em;">REQUIRED DOCUMENTS </div>
         ${reqDocs.docs_en.map((doc,i) => `
           <div style="font-size:11px;color:var(--text2);margin-bottom:3px;">
             <span style="color:var(--text3);margin-right:6px;">▸</span>${doc}
@@ -1904,7 +1903,7 @@ function renderIngredientResults() {
     const unclassifiedNote = r.unclassified && isConsultant ? `
       <div style="font-size:11px;color:var(--text3);margin-top:6px;padding:6px 10px;background:var(--bg);border-radius:4px;border-left:2px solid var(--border2);">
         Not listed in KMA 1360/2021 and not in the rule set — halal status cannot be presumed. Full evidence required (HOLD).<br>
-        <span style="color:var(--text3);">KMA 1360/2021 미등재 및 규칙 DB 미등록 — 할랄 여부 단정 불가, 전체 증빙 필요(HOLD).</span>
+ <span style="color:var(--text3);">KMA 1360/2021 DB — HOLD).</span>
       </div>` : '';
 
     return `
@@ -1920,7 +1919,7 @@ function renderIngredientResults() {
           ${showDetail && r.rule_ref ? `
             <div class="ing-detail">
               <div>${r.reason_en}</div>
-              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr}</div>
+              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en}</div>
               <div style="margin-top:6px;"><span class="rule-ref">${r.rule_ref}</span></div>
               ${isConsultant && r.article_text ? `<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;">${r.article_text}</div>` : ''}
             </div>` : ''}
@@ -1950,13 +1949,13 @@ function renderConsultantGuide() {
       </div>
       ${r.reason_en?`
         <div class="guide-box">
-          <div class="guide-title">REGULATORY BASIS 규정 근거</div>
+          <div class="guide-title">REGULATORY BASIS</div>
           <div style="color:var(--text2);font-size:11px;margin-bottom:8px;">${r.article_text||'—'}</div>
-          <div class="guide-title" style="margin-top:8px;">RESOLUTION GUIDE 해결 방법</div>
+ <div class="guide-title" style="margin-top:8px;">RESOLUTION GUIDE </div>
           <div>${r.guide_en||r.reason_en}</div>
-          <div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_kr||r.reason_kr}</div>
+          <div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_en||r.reason_en}</div>
           <div style="margin-top:6px;">
-            ${r.replaceable?'<span class="tag">REPLACEMENT REQUIRED 대체 성분 필요</span>':'<span class="tag">DOCUMENTATION REQUIRED 서류 보완 필요</span>'}
+ ${r.replaceable?'<span class="tag">REPLACEMENT REQUIRED </span>':'<span class="tag">DOCUMENTATION REQUIRED </span>'}
           </div>
         </div>`:''}
     </div>`).join('');
@@ -1980,22 +1979,22 @@ function populateStep3Issues() {
       return `
         <div class="checklist-item" style="margin-top:8px;">
           <div class="check-icon check-add" id="ci_${fid}">!</div>
-          <div class="check-label" style="flex:1;">${doc}<span class="check-label-kr">${docs_kr[j]||''}</span></div>
+          <div class="check-label" style="flex:1;">${doc}</div>
           <label class="upload-zone" onclick="triggerUpload('${fid}')">
             <input type="file" id="${fid}" multiple onchange="markIngredientDoc('${fid}','ci_${fid}','s_${fid}',${idx})" />
-            <span class="upload-zone-label">📎 Upload / 업로드</span>
+            <span class="upload-zone-label">📎 Upload</span>
             <span class="upload-status not-uploaded" id="s_${fid}">Not uploaded</span>
           </label>
         </div>`;
     }).join('');
     step3IngredientDocs.push({ idx, fileIds, isStop });
     const pill = isStop
-      ? `<span class="badge badge-stop" id="ingpill_${idx}" style="flex-shrink:0;">재구성 필요 / Reformulate</span>`
-      : `<span class="badge badge-hold" id="ingpill_${idx}" style="flex-shrink:0;">누락 / Missing</span>`;
+ ? `<span class="badge badge-stop" id="ingpill_${idx}" style="flex-shrink:0;">Reformulate</span>`
+ : `<span class="badge badge-hold" id="ingpill_${idx}" style="flex-shrink:0;">Missing</span>`;
     const supplier = r.supplier ? `<div style="font-size:11px;color:var(--text2);margin-top:3px;"><span style="font-family:var(--mono);font-size:10px;color:var(--text3);">SUPPLIER</span> ${r.supplier}</div>` : '';
     const body = isStop
       ? `<div style="margin-top:10px;font-size:11px;color:var(--red);">${rd.note_en||''}<br><span style="color:var(--text3);">${rd.note_kr||''}</span></div>`
-      : `<div style="margin-top:10px;font-size:10px;color:var(--yellow);font-family:var(--mono);letter-spacing:0.06em;">이 원료에 필요한 증빙 · REQUIRED EVIDENCE</div>
+ : `<div style="margin-top:10px;font-size:10px;color:var(--yellow);font-family:var(--mono);letter-spacing:0.06em;">REQUIRED EVIDENCE</div>
          ${slots}
          ${rd.note_en?`<div style="margin-top:8px;font-size:11px;color:var(--text3);font-style:italic;">${rd.note_en} <span style="color:var(--text3);">${rd.note_kr||''}</span></div>`:''}`;
     return `
@@ -2006,7 +2005,7 @@ function populateStep3Issues() {
             ${supplier}
             <div class="ing-detail" style="margin-top:4px;">
               <div>${r.reason_en||'—'}</div>
-              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+              <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en||''}</div>
               <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
             </div>
           </div>
@@ -2016,8 +2015,8 @@ function populateStep3Issues() {
       </div>`;
   }).join('');
   div.innerHTML = `
-    <div class="section-title">Flagged Ingredients from Step 2 — Per-Ingredient Evidence<br><span style="font-family:var(--sans);letter-spacing:0;">Step 2에서 식별된 문제 성분 — 원료별 증빙 업로드</span></div>
-    <p style="font-size:12px;color:var(--text2);margin:6px 0 14px;">Upload the evidence each ingredient needs in its own card below. Each ingredient shows its status (Missing / Partial / Complete).<br><span style="color:var(--text3);">아래 카드에서 원료별로 필요한 증빙을 업로드하세요. 원료마다 상태(누락 / 추가 필요 / 충족)가 표시됩니다.</span></p>
+ <div class="section-title">Flagged Ingredients from Step 2 — Per-Ingredient Evidence<br><span style="font-family:var(--sans);letter-spacing:0;">Step 2— </span></div>
+ <p style="font-size:12px;color:var(--text2);margin:6px 0 14px;">Upload the evidence each ingredient needs in its own card below. Each ingredient shows its status (Missing / Partial / Complete).<br></p>
     ${cards}`;
 }
 
@@ -2033,7 +2032,7 @@ function recomputeIngredientStatus(idx) {
   if (!pill) return;
   const total = entry.fileIds.length;
   const done = entry.fileIds.filter(fid=>uploadedFiles[fid]).length;
-  if (done===0) { pill.className='badge badge-hold'; pill.textContent='누락 / Missing'; }
+ if (done===0) { pill.className='badge badge-hold'; pill.textContent='Missing'; }
   else if (done<total) { pill.className='badge badge-hold'; pill.textContent='추가 필요 / Partial'; }
   else { pill.className='badge badge-ok'; pill.textContent='충족 / Complete'; }
 }
@@ -2041,6 +2040,65 @@ function recomputeIngredientStatus(idx) {
 // ============================================================
 // FINAL REPORT (STEP 7)
 // ============================================================
+
+function actionRow(n, tag, color, title, detail, ref){
+  return `<div class="reg-row" style="align-items:flex-start;">
+    <div style="display:flex;gap:10px;flex:1;">
+      <span style="font-family:var(--mono);font-size:12px;font-weight:600;color:${color};flex-shrink:0;padding-top:1px;">${String(n).padStart(2,'0')}</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;color:var(--text);"><span class="tag" style="border-color:${color};color:${color};margin-right:6px;">${tag}</span>${title}</div>
+        <div style="font-size:12px;color:var(--text2);margin-top:4px;">${detail}</div>
+        ${ref?`<span class="rule-ref" style="margin-top:6px;">${ref}</span>`:''}
+      </div>
+    </div>
+  </div>`;
+}
+
+function buildActionPlan(stopItems, holdItems, docIssues){
+  const nStop=stopItems.length, nHold=holdItems.length, nDoc=docIssues.length;
+  const total=nStop+nHold+nDoc;
+  if(total===0){
+    return `<div class="section-title">Consultant Action Plan</div>
+      <div class="reg-summary" style="border-left-color:var(--green);margin-bottom:8px;">
+        <div><span class="rs-num" style="color:var(--green)">0</span> <span class="rs-lab">open actions</span></div>
+        <div class="rs-lab">All ingredients cleared and required documents complete — ready for certification review.</div>
+      </div>`;
+  }
+  let rows='', n=1;
+  // fixed, rule-derived order: STOP (reformulate) -> HOLD (documentation) -> checklist gaps
+  stopItems.forEach(r=>{
+    rows += actionRow(n++, 'REFORMULATE', 'var(--red)',
+      `Replace or remove <b>${r.input||r.canonical||'ingredient'}</b>`,
+      r.reason_en || 'Prohibited under halal criteria — not certifiable in current form.',
+      r.rule_ref);
+  });
+  holdItems.forEach(r=>{
+    const path = (r.guide_en && r.guide_en.trim())
+      ? r.guide_en
+      : 'Resolution path not defined in Rule DB — route to consultant for manual review.';
+    rows += actionRow(n++, 'DOCUMENTATION', 'var(--yellow)',
+      `Obtain evidence for <b>${r.input||r.canonical||'ingredient'}</b>`,
+      path, r.rule_ref);
+  });
+  docIssues.forEach(d=>{
+    rows += actionRow(n++, 'DOCUMENT', 'var(--accent2)',
+      `Upload: <b>${d.label}</b>`, d.step||'', null);
+  });
+  return `<div class="section-title">Consultant Action Plan</div>
+    <div class="reg-summary" style="margin-bottom:12px;">
+      <div><span class="rs-num">${total}</span> <span class="rs-lab">ordered actions</span></div>
+      <div><span class="rs-num" style="color:var(--red)">${nStop}</span> <span class="rs-lab">reformulate</span></div>
+      <div><span class="rs-num" style="color:var(--yellow)">${nHold}</span> <span class="rs-lab">documentation</span></div>
+      <div><span class="rs-num" style="color:var(--accent2)">${nDoc}</span> <span class="rs-lab">document gaps</span></div>
+      <div class="rs-lab" style="margin-left:auto">order: reformulate &rarr; documentation &rarr; gaps</div>
+    </div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:14px;line-height:1.6;">
+      Compiled from the Rule Engine output. Ordering and content are rule-derived &mdash; the AI adds no judgment; each action carries its regulatory basis.
+    </div>
+    ${rows}
+    <hr>`;
+}
+
 function generateFinalReport() {
   const brand     = document.getElementById('brandName').value || '—';
   const product   = document.getElementById('productName').value || 'Unnamed Product';
@@ -2066,23 +2124,27 @@ function generateFinalReport() {
     PASS:{ cls:'result-pass', icon:'✅', title_en:'PASS — Ready to Proceed', title_kr:'진행 가능' }
   };
   const sc = cfgs[overallStatus];
-  const now = new Date().toLocaleString('ko-KR');
+  const now = new Date().toLocaleString('en-GB');
 
   document.getElementById('finalReport').innerHTML = `
+    <div class="print-hide" style="display:flex;justify-content:flex-end;margin-bottom:12px;">
+      <button class="print-btn" onclick="window.print()">\u{1F5A8} &nbsp;Print / Save as PDF</button>
+    </div>
     <div class="panel">
       <div class="panel-header">
         <span class="panel-step">STEP 7</span>
-        <span class="panel-title">Risk Branch Report <span class="panel-title-kr">리스크 분기 결과</span></span>
+ <span class="panel-title">Risk Branch Report <span class="panel-title-kr"></span></span>
       </div>
       <div class="panel-body">
 
         <div class="result-summary ${sc.cls}">
           <div class="result-icon">${sc.icon}</div>
           <div class="result-title">${sc.title_en}</div>
-          <div style="font-size:12px;opacity:0.7;">${sc.title_kr}</div>
         </div>
 
-        <div class="section-title">Case Information 케이스 정보</div>
+ ${buildActionPlan(stopItems, holdItems, docIssues)}
+
+        <div class="section-title">Case Information</div>
         <div class="info-row"><span class="info-key">BRAND</span><span>${brand}</span></div>
         <div class="info-row"><span class="info-key">PRODUCT</span><span>${product}</span></div>
         <div class="info-row"><span class="info-key">TYPE</span><span>${type}</span></div>
@@ -2094,16 +2156,16 @@ function generateFinalReport() {
         <div class="info-row"><span class="info-key">RULE DB</span><span style="font-family:var(--mono);font-size:11px;">${RULE_DB.version}</span></div>
 
         ${stopItems.length>0 ? `
-          <div class="section-title" style="color:var(--red);">🛑 Prohibited Ingredients — Reformulation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--red);">금지 성분 — 성분 재구성 필요</span></div>
+ <div class="section-title" style="color:var(--red);">🛑 Prohibited Ingredients — Reformulation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--red);">— </span></div>
           ${stopItems.map(r=>`
             <div class="ingredient-row">
               <div style="flex:1;">
                 <div class="ing-name">${r.canonical||r.input}</div>
                 <div class="ing-detail">
                   <div>${r.reason_en||'—'}</div>
-                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en||''}</div>
                   <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
-                  ${isConsultant&&r.article_text?`<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;">${r.article_text}</div><div class="guide-box" style="margin-top:8px;"><div class="guide-title">RESOLUTION 해결 방법</div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_kr||r.reason_kr}</div></div>`:''}
+ ${isConsultant&&r.article_text?`<div style="font-size:11px;color:var(--text3);margin-top:4px;font-style:italic;">${r.article_text}</div><div class="guide-box" style="margin-top:8px;"><div class="guide-title">RESOLUTION </div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_en||r.reason_en}</div></div>`:''}
                 </div>
               </div>
               <span class="badge badge-stop" style="flex-shrink:0;margin-top:2px;">STOP</span>
@@ -2111,16 +2173,16 @@ function generateFinalReport() {
         ` : ''}
 
         ${holdItems.length>0 ? `
-          <div class="section-title" style="color:var(--yellow);">⏸ Conditional Ingredients — Documentation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);">조건부 성분 — 서류 보완 필요</span></div>
+ <div class="section-title" style="color:var(--yellow);">⏸ Conditional Ingredients — Documentation Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);">— </span></div>
           ${holdItems.map(r=>`
             <div class="ingredient-row">
               <div style="flex:1;">
                 <div class="ing-name">${r.canonical||r.input}</div>
                 <div class="ing-detail">
                   <div>${r.reason_en||'—'}</div>
-                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en||''}</div>
                   <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
-                  ${isConsultant?`<div class="guide-box" style="margin-top:8px;"><div class="guide-title">REQUIRED DOCUMENTS 필요 서류</div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_kr||r.reason_kr}</div></div>`:''}
+ ${isConsultant?`<div class="guide-box" style="margin-top:8px;"><div class="guide-title">REQUIRED DOCUMENTS </div><div>${r.guide_en||r.reason_en}</div><div style="color:var(--text3);margin-top:4px;font-size:11px;">${r.guide_en||r.reason_en}</div></div>`:''}
                 </div>
               </div>
               <span class="badge badge-hold" style="flex-shrink:0;margin-top:2px;">HOLD</span>
@@ -2128,14 +2190,14 @@ function generateFinalReport() {
         ` : ''}
 
         ${passItems.length>0 ? `
-          <div class="section-title" style="color:var(--green);">✅ Cleared Ingredients — No Action Needed<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--green);">통과 성분 — 조치 불필요</span></div>
+ <div class="section-title" style="color:var(--green);">✅ Cleared Ingredients — No Action Needed<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--green);">— </span></div>
           ${passItems.map(r=>`
             <div class="ingredient-row">
               <div style="flex:1;">
                 <div class="ing-name">${r.canonical||r.input}</div>
                 <div class="ing-detail">
                   <div>${r.reason_en||'—'}</div>
-                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_kr||''}</div>
+                  <div style="color:var(--text3);font-size:11px;margin-top:2px;">${r.reason_en||''}</div>
                   <div style="margin-top:4px;"><span class="rule-ref">${r.rule_ref||'—'}</span></div>
                 </div>
               </div>
@@ -2144,7 +2206,7 @@ function generateFinalReport() {
         ` : ''}
 
         ${docIssues.length>0 ? `
-          <div class="section-title" style="color:var(--yellow);">📄 Document Checklist Issues — Submission Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);">서류 체크리스트 미제출 항목</span></div>
+ <div class="section-title" style="color:var(--yellow);">📄 Document Checklist Issues — Submission Required<br><span style="font-family:var(--sans);letter-spacing:0;color:var(--yellow);"></span></div>
           ${docIssues.map(d=>`
             <div class="checklist-item">
               <div class="check-icon check-no">✕</div>
@@ -2156,26 +2218,26 @@ function generateFinalReport() {
         ${overallStatus==='PASS'&&docIssues.length===0 ? `
           <div style="color:var(--green);font-size:13px;padding:16px 0;">
             ✓ All ingredients cleared and documents submitted. Ready to proceed.<br>
-            <span style="color:var(--text3);font-size:11px;">모든 성분 통과, 서류 제출 완료. 인증 진행 가능.</span>
+ 
           </div>` : ''}
 
         ${!isConsultant ? `
           <div id="handoffBox" style="margin-top:24px;border:1px solid var(--accent);border-radius:8px;padding:16px 18px;background:rgba(110,231,183,0.04);">
-            <div class="section-title" style="margin-top:0;">Hand off to a Consulting Firm — Request Analysis<br><span style="font-family:var(--sans);letter-spacing:0;">컨설팅사에 분석 의뢰</span></div>
-            <p style="font-size:12px;color:var(--text2);margin:6px 0 12px;">You've uploaded all the documents you have. Send this case — with your uploads and analysis results — to a PreHalal partner consulting firm for full review and SiHalal submission prep.<br><span style="color:var(--text3);">가진 자료를 모두 업로드하셨습니다. 이 케이스(업로드 자료·분석 결과 포함)를 PreHalal 파트너 컨설팅사에 전달해 정밀 검토와 SiHalal 제출 준비를 의뢰할 수 있습니다.</span></p>
+ <div class="section-title" style="margin-top:0;">Hand off to a Consulting Firm — Request Analysis<br><span style="font-family:var(--sans);letter-spacing:0;"></span></div>
+ <p style="font-size:12px;color:var(--text2);margin:6px 0 12px;">You've uploaded all the documents you have. Send this case — with your uploads and analysis results — to a PreHalal partner consulting firm for full review and SiHalal submission prep.<br><span style="color:var(--text3);">. PreHalal SiHalal .</span></p>
             <div style="display:flex;flex-direction:column;gap:8px;">
               <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="HalalEase Consulting" style="width:16px;height:16px;"> HalalEase Consulting</label>
               <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="Amanah Halal Consulting" style="width:16px;height:16px;"> Amanah Halal Consulting</label>
               <label style="display:flex;align-items:center;gap:10px;font-size:13px;color:var(--text);cursor:pointer;"><input type="checkbox" class="cf-pick" value="Nusantara Halal Partners" style="width:16px;height:16px;"> Nusantara Halal Partners</label>
             </div>
-            <div style="font-size:10px;color:var(--text3);margin-top:8px;">* 예시 파트너사 — PreHalal을 사용하는 여러 컨설팅사 중 복수 선택 가능 · sample partners, multiple selection allowed</div>
-            <button class="btn btn-primary" style="margin-top:14px;" onclick="submitConsultingRequest()">자료 전달 및 분석 의뢰 · Send & Request →</button>
+ <div style="font-size:10px;color:var(--text3);margin-top:8px;">* — PreHalalsample partners, multiple selection allowed</div>
+ <button class="btn btn-primary" style="margin-top:14px;" onclick="submitConsultingRequest">Send & Request →</button>
           </div>
         ` : ''}
 
         <div class="btn-row" style="margin-top:24px;">
           <button class="btn btn-ghost" onclick="prevStep(7)">← Back</button>
-          <button class="btn btn-ghost" onclick="resetAll()">↺ New Case 새 케이스</button>
+ <button class="btn btn-ghost" onclick="resetAll">↺ New Case </button>
         </div>
       </div>
     </div>`;
@@ -2189,24 +2251,22 @@ function submitConsultingRequest() {
   const caseId = 'PHL-' + new Date().getFullYear() + '-' + String(Date.now()).slice(-5);
   const box = document.getElementById('handoffBox');
   box.innerHTML = `
-    <div style="font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:0.06em;margin-bottom:8px;">✓ REQUEST SUBMITTED 의뢰 접수됨</div>
-    <div style="font-size:14px;color:var(--text);margin-bottom:10px;">분석 의뢰가 접수되었습니다. The request has been submitted.</div>
+ <div style="font-family:var(--mono);font-size:11px;color:var(--green);letter-spacing:0.06em;margin-bottom:8px;">✓ REQUEST SUBMITTED </div>
+ <div style="font-size:14px;color:var(--text);margin-bottom:10px;">. The request has been submitted.</div>
     <div class="info-row"><span class="info-key">CASE ID</span><span style="font-family:var(--mono);">${caseId}</span></div>
     <div class="info-row"><span class="info-key">PRODUCT</span><span>${product}</span></div>
     <div class="info-row"><span class="info-key">ASSIGNED TO</span><span>${names.join(', ')}</span></div>
-    <div style="font-size:11px;color:var(--text3);margin-top:10px;">선택한 컨설팅사에 업로드한 모든 자료와 분석 결과가 전달됩니다. 컨설턴트가 케이스를 검토한 뒤 연락드립니다.<br>All uploaded documents and analysis results have been shared with the selected firm(s). The consultant will review the case and follow up.</div>`;
+    <div style="font-size:11px;color:var(--text3);margin-top:10px;"><br>All uploaded documents and analysis results have been shared with the selected firm(s). The consultant will review the case and follow up.</div>`;
 }
 
 function collectDocumentIssues() {
   const checks = [
-    { id:'f1_1', label:'Business Identity (NIB / Overseas License)', step:'Step 1 — 사업자 식별(NIB)' },
-    { id:'f1_2', label:'Production Facility List & Matrix', step:'Step 1 — 생산시설 목록·매트릭스' },
-    { id:'f3_1', label:'Specification Sheets', step:'Step 3 — 원료 규격서' },
-    { id:'f3_5', label:'Origin Declaration', step:'Step 3 — 원료 유래 설명서' },
-    { id:'f4_1', label:'Process Flow Diagram', step:'Step 4 — 공정도' },
-    { id:'f5_1', label:'Halal Policy Declaration', step:'Step 5 — 할랄 방침 선언문' },
-    { id:'f5_2', label:'PHT Appointment Document', step:'Step 5 — 할랄 담당자 지정서' },
-    { id:'f6_1', label:'Label Draft', step:'Step 6 — 라벨 시안' },
+    { id:'f1_1', label:'Business Identity (NIB / Overseas License)', step:'Step 1' },
+    { id:'f1_2', label:'Production Facility List & Matrix', step:'Step 1' },
+    { id:'f3_1', label:'Specification Sheets', step:'Step 3' },
+    { id:'f3_5', label:'Origin Declaration', step:'Step 3' },
+    { id:'f4_1', label:'Process Flow Diagram', step:'Step 4' },
+    { id:'f6_1', label:'Label Draft', step:'Step 6' },
   ];
   return checks.filter(c => !uploadedFiles[c.id]);
 }
